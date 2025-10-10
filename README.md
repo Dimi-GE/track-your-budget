@@ -1,2 +1,2 @@
-# dimi-ge.github.io
+# edi.github.io
 Static web page repository test.
