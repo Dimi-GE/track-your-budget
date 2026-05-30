@@ -1,7 +1,7 @@
 .sidebar-container {
     margin: 0;
     padding: 20px 10px;
-    width: 100px;
+    width: 200px;
     border-radius: 0;
     background-color: #300159;
     position: fixed;
@@ -17,13 +17,13 @@
 }
 
 .sidebar-action-button {
-    width: 70px;
-    height: 70px;
+    width: 170px;
+    height: 35px;
     background-color: #2196f3;
     color: white;
     border: none;
-    font-size: 12px;
-    border-radius: 8px;
+    font-size: 24px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.3s;
     display: flex;
