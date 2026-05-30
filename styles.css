@@ -14,7 +14,7 @@ body {
 
 .content-container {
     flex: 1;
-    margin-left: 100px; /* Space for sidebar */
+    margin-left: 200px; /* Space for sidebar */
     padding: 30px;
     overflow-y: auto;
     background-color: white;
