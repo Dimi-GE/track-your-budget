@@ -1,6 +1,8 @@
 // Sidebar navigation configuration
 const sidebarNavigation = [
-    { label: 'Home', view: 'home' }
+    { label: 'Home', view: 'home' },
+    { label: 'Macros', view: 'macros' },
+    { label: 'Weekly', view: 'weekly' },
 ];
 
 // Create footer
