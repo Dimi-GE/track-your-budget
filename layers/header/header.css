@@ -1,0 +1,12 @@
+.header-container {
+    grid-column: 2;
+    grid-row: 1;
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--stripe-color-a),
+        var(--stripe-color-a) 10px,
+        var(--stripe-color-b) 10px,
+        var(--stripe-color-b) 20px
+    );
+    opacity: 0.85;
+}

@@ -1,0 +1,68 @@
+<div class="dashboard-view">
+
+    <!-- Entry Row + File Operations -->
+    <section class="dashboard-section">
+        <h2 class="section-title">New Entry</h2>
+        <div class="entry-row">
+            <input type="date" id="input-date" />
+            <input type="number" id="input-amount" placeholder="0.00" />
+            <select id="select-type">
+                <option value="income">Income</option>
+                <option value="savings">Savings</option>
+                <option value="expenses">Expenses</option>
+            </select>
+            <select id="select-category"></select>
+            <input type="text" id="input-note" placeholder="Note (optional)" />
+            <button id="btn-add">Add</button>
+
+            <div class="file-ops">
+                <div class="file-ops-panel" id="file-ops-panel">
+                    <input type="text" id="input-filename" placeholder="dashboard-backup" class="filename-input" />
+                    <label class="btn-secondary" for="input-import">Import</label>
+                    <input type="file" id="input-import" accept=".json" style="display:none;" />
+                    <button id="btn-export" class="btn-secondary">Export</button>
+                </div>
+                <button id="btn-file-toggle" class="btn-file-toggle" title="Backup options"><i class="ti ti-file-export"></i></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Staged Entries -->
+    <section class="dashboard-section">
+        <h2 class="section-title">Staged Entries</h2>
+        <div class="entries-history" id="entries-history">
+            <div class="entries-empty">No staged entries yet</div>
+        </div>
+        <button id="btn-apply" class="btn-apply" disabled>Apply</button>
+    </section>
+
+    <!-- Info Cards -->
+    <section class="dashboard-section">
+        <h2 class="section-title">Overview</h2>
+        <div class="cards-row">
+            <div class="info-card">
+                <span class="card-label">Income</span>
+                <span class="card-value" id="display-income">—</span>
+            </div>
+            <div class="info-card">
+                <span class="card-label">Savings</span>
+                <span class="card-value" id="display-savings">—</span>
+            </div>
+            <div class="info-card">
+                <span class="card-label">Total Expenses</span>
+                <span class="card-value" id="display-expenses">—</span>
+            </div>
+            <div class="info-card highlight">
+                <span class="card-label">Flow</span>
+                <span class="card-value" id="display-flow">—</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expenses Chart — injected by dashboard.js -->
+    <section class="dashboard-section" id="expenses-chart-slot"></section>
+
+    <!-- Transaction History — injected by dashboard.js -->
+    <section class="dashboard-section" id="tx-history-slot"></section>
+
+</div>

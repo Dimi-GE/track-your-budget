@@ -1,0 +1,23 @@
+<div class="tx-container" id="tx-container">
+    <div class="tx-header">
+        <h2 class="section-title" style="margin-bottom:0;">Recent Transactions</h2>
+        <div class="tx-filters">
+            <select id="tx-filter-type" class="tx-filter-select">
+                <option value="">All types</option>
+                <option value="income">Income</option>
+                <option value="savings">Savings</option>
+                <option value="expenses">Expenses</option>
+            </select>
+            <select id="tx-filter-category" class="tx-filter-select">
+                <option value="">All categories</option>
+            </select>
+        </div>
+        <span class="link-text" id="btn-tx-toggle">Full History</span>
+    </div>
+    <div class="tx-list" id="tx-list">
+        <div class="entries-empty">No transactions yet</div>
+    </div>
+</div>
+
+<!-- Backdrop lives outside the component so it covers everything -->
+<div class="tx-backdrop" id="tx-backdrop"></div>

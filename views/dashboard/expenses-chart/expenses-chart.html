@@ -1,0 +1,32 @@
+<div class="chart-container" id="chart-container">
+    <div class="chart-header">
+        <h2 class="section-title" style="margin-bottom:0;">Expenses by category</h2>
+        <div class="chart-controls">
+            <div class="period-picker">
+                <input type="date" id="period-start" class="period-input" />
+                <span class="period-sep">&ndash;</span>
+                <input type="date" id="period-end" class="period-input" />
+            </div>
+            <div class="period-file-ops">
+                <div class="file-ops-panel" id="period-file-ops-panel">
+                    <input type="text" id="period-input-filename" placeholder="dashboard-backup" class="filename-input" />
+                    <label class="btn-secondary" for="period-input-import">Import</label>
+                    <input type="file" id="period-input-import" accept=".json" style="display:none;" />
+                    <button id="btn-export-period" class="btn-secondary">Export</button>
+                </div>
+                <button id="btn-period-file-toggle" class="btn-period-file-toggle" title="Period import/export"><i class="ti ti-file-export"></i></button>
+            </div>
+            <span class="link-text" id="btn-legend-toggle">Legend</span>
+        </div>
+    </div>
+
+    <!-- Legend panel -->
+    <div class="legend-panel" id="legend-panel">
+        <div class="legend-grid" id="legend-grid"></div>
+    </div>
+
+    <!-- Chart -->
+    <div class="chart-wrap">
+        <canvas id="expenses-chart" role="img" aria-label="Vertical bar chart showing expenses by category for the selected period"></canvas>
+    </div>
+</div>

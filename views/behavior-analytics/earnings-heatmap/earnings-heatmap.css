@@ -1,0 +1,5 @@
+.earnings-cell[data-level="0"] { background-color: #1c1c28; }
+.earnings-cell[data-level="1"] { background-color: #0b3320; }
+.earnings-cell[data-level="2"] { background-color: #175c38; }
+.earnings-cell[data-level="3"] { background-color: #228550; }
+.earnings-cell[data-level="4"] { background-color: #4caf7d; }

@@ -1,0 +1,40 @@
+<p class="heatmap-subtitle">Spendings</p>
+
+<div class="heatmap-months-row">
+    <div class="heatmap-wday-spacer"></div>
+    <div class="heatmap-month-labels" id="spending-month-labels"></div>
+</div>
+
+<div class="heatmap-grid-row">
+    <div class="heatmap-wday-labels">
+        <span>Mon</span>
+        <span></span>
+        <span>Wed</span>
+        <span></span>
+        <span>Fri</span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="heatmap-grid" id="spending-heatmap-grid"></div>
+    <div class="year-picker" id="spending-year-picker">
+        <button class="year-nav-btn" id="spending-year-up"><i class="ti ti-chevron-up"></i></button>
+        <div class="year-slots" id="spending-year-slots"></div>
+        <button class="year-nav-btn" id="spending-year-down"><i class="ti ti-chevron-down"></i></button>
+    </div>
+    <div class="heatmap-q-btns" id="spending-quarter-btns">
+        <button class="quarter-btn" data-q="1">Q1</button>
+        <button class="quarter-btn" data-q="2">Q2</button>
+        <button class="quarter-btn" data-q="3">Q3</button>
+        <button class="quarter-btn" data-q="4">Q4</button>
+    </div>
+</div>
+
+<div class="heatmap-legend">
+    <span class="heatmap-legend-label">Less</span>
+    <div class="heatmap-cell spending-cell" data-level="0"></div>
+    <div class="heatmap-cell spending-cell" data-level="1"></div>
+    <div class="heatmap-cell spending-cell" data-level="2"></div>
+    <div class="heatmap-cell spending-cell" data-level="3"></div>
+    <div class="heatmap-cell spending-cell" data-level="4"></div>
+    <span class="heatmap-legend-label">More</span>
+</div>

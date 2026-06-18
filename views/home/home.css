@@ -1,44 +1,202 @@
 .home-view {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.home-view h1 {
-    color: #333;
-    margin-bottom: 20px;
-}
-
-.home-view p {
-    color: #666;
-    margin-bottom: 40px;
-}
-
-.home-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 20px;
+    max-width: 1100px;
+}
+
+.home-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.home-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.home-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* KPI row */
+.home-kpi-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .home-kpi-row { grid-template-columns: repeat(2, 1fr); }
 }
 
 .home-card {
-    background-color: #f9f9f9;
-    border: 2px solid #ddd;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.home-card__icon {
+    width: 40px;
+    height: 40px;
     border-radius: 8px;
-    padding: 30px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: rgba(245, 168, 0, 0.1);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 20px;
 }
 
-.home-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.home-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
 }
 
-.home-card h3 {
-    color: #2196f3;
-    margin-bottom: 10px;
+.home-card__label {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
-.home-card p {
-    color: #666;
-    font-size: 14px;
-    margin-bottom: 0;
+/* Main grid */
+.home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+@media (max-width: 700px) {
+    .home-grid { grid-template-columns: 1fr; }
+}
+
+.home-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.home-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.home-panel__header i {
+    font-size: 16px;
+    color: var(--accent);
+}
+
+.home-panel__body {
+    padding: 16px;
+}
+
+.home-panel__body--list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.home-panel__body--center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Placeholder shimmer */
+@keyframes shimmer {
+    0%   { opacity: 0.4; }
+    50%  { opacity: 0.7; }
+    100% { opacity: 0.4; }
+}
+
+.placeholder-block,
+.placeholder-row,
+.placeholder-chart,
+.placeholder-donut,
+.placeholder-goal__label,
+.placeholder-goal__bar {
+    background: var(--border);
+    border-radius: 4px;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.placeholder-block {
+    display: block;
+    height: 20px;
+    width: 80px;
+    border-radius: 4px;
+}
+
+.placeholder-row {
+    height: 14px;
+    width: 100%;
+    border-radius: 4px;
+}
+
+.placeholder-row:nth-child(even) { width: 75%; }
+
+.placeholder-chart {
+    height: 140px;
+    width: 100%;
+    border-radius: 6px;
+}
+
+.placeholder-donut {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    border: 18px solid var(--border);
+    background: transparent;
+    animation: shimmer 1.8s ease-in-out infinite;
+}
+
+/* Goals */
+.placeholder-goal {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.placeholder-goal__label {
+    height: 12px;
+    width: 55%;
+}
+
+.placeholder-goal__bar {
+    height: 8px;
+    width: 100%;
+    border-radius: 99px;
+    position: relative;
+    overflow: hidden;
+    animation: none;
+    background: rgba(255,255,255,0.07);
+}
+
+.placeholder-goal__fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+    border-radius: 99px;
 }

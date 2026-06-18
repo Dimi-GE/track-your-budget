@@ -1,19 +1,100 @@
 <div class="home-view">
-    <h1>Welcome to Your Web App</h1>
-    <p>This is the home view. Use the sidebar to navigate to different sections.</p>
-    
-    <div class="home-cards">
-        <div class="home-card">
-            <h3>Reporting Tool</h3>
-            <p>View weekly reports and data visualizations</p>
+
+    <div class="home-header">
+        <h1 class="home-title">Home</h1>
+        <span class="home-subtitle">Overview</span>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="home-kpi-row">
+        <div class="home-card home-card--placeholder">
+            <div class="home-card__icon"><i class="ti ti-wallet"></i></div>
+            <div class="home-card__body">
+                <span class="home-card__label">Net Worth</span>
+                <span class="home-card__value placeholder-block"></span>
+            </div>
         </div>
-        <div class="home-card">
-            <h3>Feedback</h3>
-            <p>Manage user feedback messages</p>
+        <div class="home-card home-card--placeholder">
+            <div class="home-card__icon"><i class="ti ti-trending-up"></i></div>
+            <div class="home-card__body">
+                <span class="home-card__label">Monthly Income</span>
+                <span class="home-card__value placeholder-block"></span>
+            </div>
         </div>
-        <div class="home-card">
-            <h3>Templates</h3>
-            <p>Access support message templates</p>
+        <div class="home-card home-card--placeholder">
+            <div class="home-card__icon"><i class="ti ti-trending-down"></i></div>
+            <div class="home-card__body">
+                <span class="home-card__label">Monthly Expenses</span>
+                <span class="home-card__value placeholder-block"></span>
+            </div>
+        </div>
+        <div class="home-card home-card--placeholder">
+            <div class="home-card__icon"><i class="ti ti-cash"></i></div>
+            <div class="home-card__body">
+                <span class="home-card__label">Cash Flow</span>
+                <span class="home-card__value placeholder-block"></span>
+            </div>
         </div>
     </div>
+
+    <!-- Main content grid -->
+    <div class="home-grid">
+
+        <div class="home-panel home-panel--placeholder">
+            <div class="home-panel__header">
+                <i class="ti ti-chart-line"></i>
+                <span>Spending Trend</span>
+            </div>
+            <div class="home-panel__body">
+                <div class="placeholder-chart"></div>
+            </div>
+        </div>
+
+        <div class="home-panel home-panel--placeholder">
+            <div class="home-panel__header">
+                <i class="ti ti-list"></i>
+                <span>Recent Transactions</span>
+            </div>
+            <div class="home-panel__body home-panel__body--list">
+                <div class="placeholder-row"></div>
+                <div class="placeholder-row"></div>
+                <div class="placeholder-row"></div>
+                <div class="placeholder-row"></div>
+                <div class="placeholder-row"></div>
+            </div>
+        </div>
+
+        <div class="home-panel home-panel--placeholder">
+            <div class="home-panel__header">
+                <i class="ti ti-chart-donut"></i>
+                <span>Expense Breakdown</span>
+            </div>
+            <div class="home-panel__body home-panel__body--center">
+                <div class="placeholder-donut"></div>
+            </div>
+        </div>
+
+        <div class="home-panel home-panel--placeholder">
+            <div class="home-panel__header">
+                <i class="ti ti-target"></i>
+                <span>Savings Goals</span>
+            </div>
+            <div class="home-panel__body home-panel__body--list">
+                <div class="placeholder-goal">
+                    <div class="placeholder-goal__label"></div>
+                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:62%"></div></div>
+                </div>
+                <div class="placeholder-goal">
+                    <div class="placeholder-goal__label"></div>
+                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:38%"></div></div>
+                </div>
+                <div class="placeholder-goal">
+                    <div class="placeholder-goal__label"></div>
+                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:81%"></div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>

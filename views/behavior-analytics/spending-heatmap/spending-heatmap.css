@@ -1,0 +1,5 @@
+.spending-cell[data-level="0"] { background-color: #1c1c28; }
+.spending-cell[data-level="1"] { background-color: #3d1212; }
+.spending-cell[data-level="2"] { background-color: #6b2020; }
+.spending-cell[data-level="3"] { background-color: #a83030; }
+.spending-cell[data-level="4"] { background-color: #e05c5c; }

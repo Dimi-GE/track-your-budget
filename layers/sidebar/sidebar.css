@@ -1,0 +1,86 @@
+.sidebar-container {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    background-color: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 12px 0;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    margin: 0 8px;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    user-select: none;
+    overflow: hidden;
+}
+
+.nav-item:hover { background-color: rgba(255,255,255,0.05); color: var(--text-primary); }
+.nav-item.active { color: var(--accent); }
+.nav-item--disabled { opacity: 0.35; cursor: default; }
+.nav-item--disabled:hover { background-color: transparent; color: var(--text-muted); }
+
+/* Icon column — fixed width matching the collapsed sidebar minus margins.
+   Always text-centered, so the icon sits in the same spot at any sidebar width. */
+.nav-item i {
+    width: 40px;
+    flex-shrink: 0;
+    font-size: 20px;
+    text-align: center;
+    pointer-events: none;
+}
+
+/* Label column — slides in/out independently */
+.nav-label {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 120px;
+    padding-right: 12px;
+    opacity: 1;
+    transition: max-width 0.25s ease, opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.window-wrapper.sidebar-collapsed .nav-label {
+    max-width: 0;
+    opacity: 0;
+}
+
+/* Toggle button */
+.sidebar-toggle {
+    margin: 8px;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.sidebar-toggle:hover { color: var(--text-primary); border-color: var(--text-muted); }
+.sidebar-toggle i { font-size: 16px; pointer-events: none; transition: transform 0.25s ease; }
+
+.window-wrapper.sidebar-collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
+}
