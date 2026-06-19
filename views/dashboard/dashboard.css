@@ -35,7 +35,11 @@
     height: 38px;
 }
 
-.entry-row input[type="date"]   { width: 150px; }
+.entry-row input[type="date"]     { width: 150px; color: var(--text-muted); color-scheme: dark; }
+.entry-row input[type="number"]   { -moz-appearance: textfield; }
+.entry-row input[type="number"]::-webkit-inner-spin-button,
+.entry-row input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.entry-row input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.8); cursor: pointer; }
 .entry-row input[type="number"] { width: 120px; }
 .entry-row select               { width: 140px; cursor: pointer; color: var(--text-muted); }
 .entry-row input#input-note     { flex: 1; min-width: 140px; color: var(--text-muted); }

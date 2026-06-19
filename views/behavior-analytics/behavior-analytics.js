@@ -28,8 +28,10 @@ function initBehaviorAnalytics() {
     Promise.all([
         loadComponent(document.getElementById('spending-heatmap-slot'), 'spending-heatmap'),
         loadComponent(document.getElementById('earnings-heatmap-slot'), 'earnings-heatmap'),
+        loadComponent(document.getElementById('trends-component-slot'), 'trends'),
     ]).then(() => {
         initSpendingHeatmap();
         initEarningsHeatmap();
+        initTrends();
     });
 }
