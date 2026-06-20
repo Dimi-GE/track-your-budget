@@ -5,20 +5,39 @@
         <span class="tt-subtitle" id="tt-today-label"></span>
     </div>
 
-    <!-- Timesheet Settings -->
-    <div class="tt-section">
-        <h2 class="section-title">Timesheet Settings</h2>
-        <div class="tt-settings-card">
-            <div class="tt-settings-row">
-                <label class="tt-settings-label">Freelancer Name</label>
-                <input type="text" id="tt-freelancer" class="tt-settings-input" placeholder="Your name" />
+    <!-- Settings + Timer row -->
+    <div class="tt-top-row">
+
+        <div class="tt-top-panel">
+            <h2 class="section-title">Timesheet Settings</h2>
+            <div class="tt-settings-card">
+                <div class="tt-settings-row">
+                    <label class="tt-settings-label">Freelancer Name</label>
+                    <input type="text" id="tt-freelancer" class="tt-settings-input" placeholder="Your name" />
+                </div>
+                <div class="tt-settings-row">
+                    <label class="tt-settings-label">Company</label>
+                    <input type="text" id="tt-company" class="tt-settings-input" placeholder="Client / company name" />
+                </div>
             </div>
-            <div class="tt-settings-row">
-                <label class="tt-settings-label">Company</label>
-                <input type="text" id="tt-company" class="tt-settings-input" placeholder="Client / company name" />
-            </div>
-            <button class="tt-settings-save" id="tt-settings-save">Save</button>
         </div>
+
+        <div class="tt-top-panel">
+            <h2 class="section-title">Timer</h2>
+            <div class="tt-timer-card">
+                <div class="tt-timer-left">
+                    <div class="tt-timer-display" id="tt-display">00:00:00</div>
+                    <div class="tt-timer-meta">
+                        <input type="text" id="tt-session-label" class="tt-session-input" placeholder="What are you working on?" />
+                    </div>
+                </div>
+                <div class="tt-timer-actions">
+                    <button class="tt-btn-start" id="tt-btn-start">Start</button>
+                    <button class="tt-btn-submit" id="tt-btn-submit">Submit</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Timesheet Calendar -->
@@ -34,25 +53,6 @@
             </button>
         </div>
         <div class="tt-calendar" id="tt-calendar"></div>
-    </div>
-
-    <!-- Timer -->
-    <div class="tt-timer-card">
-        <div class="tt-timer-left">
-            <div class="tt-timer-display" id="tt-display">00:00:00</div>
-            <div class="tt-timer-meta">
-                <input type="text" id="tt-session-label" class="tt-session-input" placeholder="What are you working on?" />
-                <select id="tt-session-tag" class="tt-tag-select">
-                    <option value="">No tag</option>
-                    <option value="development">Development</option>
-                    <option value="design">Design</option>
-                    <option value="research">Research</option>
-                    <option value="meetings">Meetings</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-        </div>
-        <button class="tt-btn-start" id="tt-btn-start">Start</button>
     </div>
 
     <!-- Today's sessions -->

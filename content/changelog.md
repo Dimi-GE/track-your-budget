@@ -1,3 +1,16 @@
+## v0.0.1c.3 — June 2026
+
+- `feature` Time Tracking — Submit button wires timer to the calendar: submitting a session adds hours and task label to today's calendar entry, the Today list, and the This Week bars
+- `feature` Time Tracking — Today sessions rendered as a scrollable list capped at 4 visible entries, wrapped in a surface card
+- `feature` Time Tracking — This Week bars now reflect real data from committed entries, scaling relative to the busiest day
+- `improvement` Time Tracking — Settings and Timer placed side by side in a responsive flex row that stacks on narrow screens
+- `improvement` Time Tracking — Timer counter reduced to 28px; tag dropdown removed as unused
+- `improvement` Time Tracking — Submit button styled with orange border and text; both buttons compacted
+- `improvement` Time Tracking — View no longer capped at 900px; fills the full content frame like other views
+- `improvement` PDF export — other-month days (overflow weeks) now styled the same as weekends — lighter salmon fill
+- `improvement` PDF export — row height tightened: font reduced to 8.5pt, cell padding halved to 1.5mm
+- `improvement` Analytics — heatmap intensity row made responsive; columns wrap on narrow screens
+
 ## v0.0.1c.2 — June 2026
 
 - `feature` Roadmap entries rendered as rows with horizontal card layout — each category (Planned, In Progress, Ideas, Done) is a labelled row with cards flowing inline
