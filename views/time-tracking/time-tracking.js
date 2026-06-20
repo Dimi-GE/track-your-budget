@@ -11,15 +11,38 @@ function initTimeTracking() {
         return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
     }
 
-    const MONTH_NAMES = ['January','February','March','April','May','June',
-                         'July','August','September','October','November','December'];
+    function formatDuration(ms) {
+        const s = Math.floor(ms / 1000);
+        return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+    }
+
+    function formatShort(ms) {
+        const totalMin = Math.floor(ms / 60000);
+        const h = Math.floor(totalMin / 60);
+        const m = totalMin % 60;
+        return h > 0 ? `${h}h ${pad(m)}m` : `${m}m`;
+    }
+
+    const MONTH_NAMES    = ['January','February','March','April','May','June',
+                            'July','August','September','October','November','December'];
+    const WEEKDAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const now            = new Date();
+
+    // ── Storage helpers ────────────────────────────────────────────────────
+    function loadEntries()        { return JSON.parse(localStorage.getItem('tt_entries')  || '{}'); }
+    function saveEntries(e)       { localStorage.setItem('tt_entries',  JSON.stringify(e)); }
+    function loadSessions()       { return JSON.parse(localStorage.getItem('tt_sessions') || '{}'); }
+    function saveSessions(s)      { localStorage.setItem('tt_sessions', JSON.stringify(s)); }
+    function loadSettings()       { return JSON.parse(localStorage.getItem('tt_settings') || '{}'); }
 
     // ── Timer ──────────────────────────────────────────────────────────────
     const display    = document.getElementById('tt-display');
     const btnStart   = document.getElementById('tt-btn-start');
+    const btnSubmit  = document.getElementById('tt-btn-submit');
+    const sessionLbl = document.getElementById('tt-session-label');
     const todayLabel = document.getElementById('tt-today-label');
 
-    todayLabel.textContent = new Date().toLocaleDateString('en-US', {
+    todayLabel.textContent = now.toLocaleDateString('en-US', {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
@@ -28,9 +51,20 @@ function initTimeTracking() {
     let elapsed   = 0;
     let ticker    = null;
 
-    function formatDuration(ms) {
-        const s = Math.floor(ms / 1000);
-        return `${pad(Math.floor(s / 3600))}:${pad(Math.floor((s % 3600) / 60))}:${pad(s % 60)}`;
+    function stopTimer() {
+        if (running) {
+            running  = false;
+            elapsed += Date.now() - startTime;
+            clearInterval(ticker);
+            btnStart.textContent = 'Start';
+            btnStart.classList.remove('running');
+            display.classList.remove('running');
+        }
+    }
+
+    function resetTimer() {
+        elapsed = 0;
+        display.textContent = '00:00:00';
     }
 
     btnStart.addEventListener('click', () => {
@@ -44,22 +78,118 @@ function initTimeTracking() {
             btnStart.classList.add('running');
             display.classList.add('running');
         } else {
-            running  = false;
-            elapsed += Date.now() - startTime;
-            clearInterval(ticker);
-            btnStart.textContent = 'Start';
-            btnStart.classList.remove('running');
-            display.classList.remove('running');
+            stopTimer();
         }
     });
+
+    btnSubmit.addEventListener('click', () => {
+        const durationMs = elapsed + (running ? Date.now() - startTime : 0);
+        if (durationMs < 1000) return; // nothing meaningful to submit
+
+        stopTimer();
+
+        const todayKey   = dateKey(new Date());
+        const label      = sessionLbl.value.trim();
+        const hours      = Math.round((durationMs / 3600000) * 100) / 100;
+        const timeStr    = `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`;
+
+        // Save individual session
+        const sessions   = loadSessions();
+        if (!sessions[todayKey]) sessions[todayKey] = [];
+        sessions[todayKey].push({ label, durationMs, time: timeStr });
+        saveSessions(sessions);
+
+        // Merge into calendar entry
+        const entries    = loadEntries();
+        const existing   = entries[todayKey] || { hours: 0, tasks: [] };
+        existing.hours   = Math.round((existing.hours + hours) * 100) / 100;
+        if (label && !existing.tasks.includes(label)) existing.tasks.push(label);
+        entries[todayKey] = existing;
+        saveEntries(entries);
+
+        // Reset
+        resetTimer();
+        sessionLbl.value = '';
+
+        // Re-render
+        renderTodaySessions();
+        renderWeekBars();
+        renderCalendar();
+    });
+
+    // ── Today's sessions ───────────────────────────────────────────────────
+    const sessionsList = document.getElementById('tt-sessions-list');
+    const dayTotalEl   = document.getElementById('tt-day-total');
+
+    function renderTodaySessions() {
+        const todayKey = dateKey(new Date());
+        const sessions = (loadSessions()[todayKey] || []);
+
+        if (sessions.length === 0) {
+            sessionsList.innerHTML = '<div class="tt-empty">No sessions recorded today</div>';
+            dayTotalEl.textContent = '0h 00m';
+            return;
+        }
+
+        sessionsList.innerHTML = sessions.map(s => `
+            <div class="tt-session-row">
+                <span class="tt-session-row-label">${s.label || '—'}</span>
+                <span class="tt-session-row-time">${s.time}</span>
+                <span class="tt-session-row-duration">${formatShort(s.durationMs)}</span>
+            </div>
+        `).join('');
+
+        const totalMs = sessions.reduce((sum, s) => sum + s.durationMs, 0);
+        dayTotalEl.textContent = formatShort(totalMs);
+    }
+
+    renderTodaySessions();
+
+    // ── This Week bars ─────────────────────────────────────────────────────
+    const weekGrid = document.getElementById('tt-week-grid');
+
+    function getWeekDays() {
+        const d   = new Date();
+        const dow = d.getDay(); // 0=Sun
+        const toMon = dow === 0 ? -6 : 1 - dow;
+        return Array.from({ length: 7 }, (_, i) => {
+            const day = new Date(d.getFullYear(), d.getMonth(), d.getDate() + toMon + i);
+            return day;
+        });
+    }
+
+    function renderWeekBars() {
+        const entries = loadEntries();
+        const days    = getWeekDays();
+        const hours   = days.map(d => (entries[dateKey(d)] || {}).hours || 0);
+        const max     = Math.max(...hours, 1);
+
+        weekGrid.innerHTML = days.map((day, i) => {
+            const pct   = Math.round((hours[i] / max) * 100);
+            const label = WEEKDAY_LABELS[i];
+            const val   = hours[i] > 0 ? `${hours[i]}h` : '';
+            return `
+                <div class="tt-week-day">
+                    <span class="tt-week-day-label">${label}</span>
+                    <div class="tt-week-bar-wrap">
+                        <div class="tt-week-bar" style="height:${pct}%"></div>
+                    </div>
+                    <span class="tt-week-day-value">${val}</span>
+                </div>`;
+        }).join('');
+    }
+
+    renderWeekBars();
 
     // ── Settings ───────────────────────────────────────────────────────────
     const freelancerInput = document.getElementById('tt-freelancer');
     const companyInput    = document.getElementById('tt-company');
-    const btnSaveSettings = document.getElementById('tt-settings-save');
 
-    function loadSettings() {
-        return JSON.parse(localStorage.getItem('tt_settings') || '{}');
+    function persistSettings() {
+        localStorage.setItem('tt_settings', JSON.stringify({
+            freelancer: freelancerInput.value.trim(),
+            company:    companyInput.value.trim(),
+        }));
     }
 
     (function applySettings() {
@@ -68,55 +198,33 @@ function initTimeTracking() {
         companyInput.value    = s.company    || '';
     })();
 
-    btnSaveSettings.addEventListener('click', () => {
-        localStorage.setItem('tt_settings', JSON.stringify({
-            freelancer: freelancerInput.value.trim(),
-            company:    companyInput.value.trim(),
-        }));
-        btnSaveSettings.textContent = 'Saved';
-        setTimeout(() => { btnSaveSettings.textContent = 'Save'; }, 1500);
+    [freelancerInput, companyInput].forEach(input => {
+        input.addEventListener('blur', persistSettings);
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') e.target.blur(); });
     });
 
-    // ── Timesheet data ─────────────────────────────────────────────────────
-    function loadEntries() {
-        return JSON.parse(localStorage.getItem('tt_entries') || '{}');
-    }
-
-    function saveEntries(entries) {
-        localStorage.setItem('tt_entries', JSON.stringify(entries));
-    }
-
     // ── Calendar ───────────────────────────────────────────────────────────
-    const now          = new Date();
-    let   calYear      = now.getFullYear();
-    let   calMonth     = now.getMonth();
+    let calYear  = now.getFullYear();
+    let calMonth = now.getMonth();
 
     const calContainer = document.getElementById('tt-calendar');
     const calLabel     = document.getElementById('tt-cal-label');
     const btnCalPrev   = document.getElementById('tt-cal-prev');
     const btnCalNext   = document.getElementById('tt-cal-next');
 
-    const WEEKDAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
     function getTimesheetWeeks(year, month) {
-        const firstDay   = new Date(year, month, 1);
-        const firstDow   = firstDay.getDay(); // 0=Sun
-        const toMonday   = firstDow === 0 ? 6 : firstDow - 1;
-        const start      = new Date(year, month, 1 - toMonday);
-
-        const lastDay    = new Date(year, month + 1, 0);
-        const lastDow    = lastDay.getDay();
-        const toSunday   = lastDow === 0 ? 0 : 7 - lastDow;
-        const end        = new Date(year, month + 1, toSunday);
+        const firstDay = new Date(year, month, 1);
+        const toMonday = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+        const start    = new Date(year, month, 1 - toMonday);
+        const lastDay  = new Date(year, month + 1, 0);
+        const toSunday = lastDay.getDay() === 0 ? 0 : 7 - lastDay.getDay();
+        const end      = new Date(year, month + 1, toSunday);
 
         const weeks = [];
         const cur   = new Date(start);
         while (cur <= end) {
             const week = [];
-            for (let i = 0; i < 7; i++) {
-                week.push(new Date(cur));
-                cur.setDate(cur.getDate() + 1);
-            }
+            for (let i = 0; i < 7; i++) { week.push(new Date(cur)); cur.setDate(cur.getDate() + 1); }
             weeks.push(week);
         }
         return weeks;
@@ -127,13 +235,11 @@ function initTimeTracking() {
         const todayKey = dateKey(now);
         const weeks    = getTimesheetWeeks(calYear, calMonth);
 
-        calLabel.textContent = `${MONTH_LABELS[calMonth]} ${calYear}`;
+        calLabel.textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
 
-        const weekdayHeaders = WEEKDAY_LABELS
-            .map(d => `<div class="tt-cal-weekday">${d}</div>`)
-            .join('');
+        const headers = WEEKDAY_LABELS.map(d => `<div class="tt-cal-weekday">${d}</div>`).join('');
+        let daysHtml  = '';
 
-        let daysHtml = '';
         weeks.forEach(week => {
             week.forEach(date => {
                 const key       = dateKey(date);
@@ -154,14 +260,13 @@ function initTimeTracking() {
 
                 daysHtml += `<button class="${cls}" data-key="${key}">
                     <span class="tt-cal-day-num">${date.getDate()}</span>
-                    ${hoursHtml}
-                    ${tasksHtml}
+                    ${hoursHtml}${tasksHtml}
                 </button>`;
             });
         });
 
         calContainer.innerHTML = `
-            <div class="tt-cal-weekdays">${weekdayHeaders}</div>
+            <div class="tt-cal-weekdays">${headers}</div>
             <div class="tt-cal-days">${daysHtml}</div>`;
 
         calContainer.querySelectorAll('.tt-cal-day').forEach(btn => {
@@ -169,17 +274,13 @@ function initTimeTracking() {
         });
     }
 
-    const MONTH_LABELS = MONTH_NAMES;
-
     btnCalPrev.addEventListener('click', () => {
-        calMonth--;
-        if (calMonth < 0) { calMonth = 11; calYear--; }
+        if (--calMonth < 0) { calMonth = 11; calYear--; }
         renderCalendar();
     });
 
     btnCalNext.addEventListener('click', () => {
-        calMonth++;
-        if (calMonth > 11) { calMonth = 0; calYear++; }
+        if (++calMonth > 11) { calMonth = 0; calYear++; }
         renderCalendar();
     });
 
@@ -200,14 +301,11 @@ function initTimeTracking() {
         activeKey = key;
         const entry   = loadEntries()[key] || { hours: 0, tasks: [] };
         const [y,m,d] = key.split('-').map(Number);
-        const date    = new Date(y, m - 1, d);
-
-        modalTitle.textContent = date.toLocaleDateString('en-GB', {
+        modalTitle.textContent = new Date(y, m - 1, d).toLocaleDateString('en-GB', {
             weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
         });
         modalHours.value = entry.hours || '';
         modalTasks.value = (entry.tasks || []).join('\n');
-
         backdrop.classList.add('open');
         modalHours.focus();
     }
@@ -220,12 +318,14 @@ function initTimeTracking() {
     btnModalSave.addEventListener('click', () => {
         if (!activeKey) return;
         const entries = loadEntries();
-        const hours   = parseFloat(modalHours.value) || 0;
-        const tasks   = modalTasks.value.split('\n').map(t => t.trim()).filter(Boolean);
-        entries[activeKey] = { hours, tasks };
+        entries[activeKey] = {
+            hours: parseFloat(modalHours.value) || 0,
+            tasks: modalTasks.value.split('\n').map(t => t.trim()).filter(Boolean),
+        };
         saveEntries(entries);
         closeModal();
         renderCalendar();
+        renderWeekBars();
     });
 
     btnModalDel.addEventListener('click', () => {
@@ -235,13 +335,11 @@ function initTimeTracking() {
         saveEntries(entries);
         closeModal();
         renderCalendar();
+        renderWeekBars();
     });
 
     btnModalCanc.addEventListener('click', closeModal);
-
-    backdrop.addEventListener('click', e => {
-        if (e.target === backdrop) closeModal();
-    });
+    backdrop.addEventListener('click', e => { if (e.target === backdrop) closeModal(); });
 
     // ── PDF Export ─────────────────────────────────────────────────────────
     const JSPDF_CDN     = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js';
@@ -255,16 +353,16 @@ function initTimeTracking() {
     });
 
     function generatePDF() {
-        const { jsPDF }   = window.jspdf;
-        const doc         = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-        const settings    = loadSettings();
-        const entries     = loadEntries();
-        const weeks       = getTimesheetWeeks(calYear, calMonth);
+        const { jsPDF } = window.jspdf;
+        const doc       = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+        const settings  = loadSettings();
+        const entries   = loadEntries();
+        const weeks     = getTimesheetWeeks(calYear, calMonth);
 
-        const margin      = 14;
-        const pageWidth   = 297 - margin * 2;   // A4 landscape
-        const labelColW   = 20;
-        const dayColW     = (pageWidth - labelColW) / 7;
+        const margin    = 14;
+        const pageWidth = 297 - margin * 2;
+        const labelColW = 20;
+        const dayColW   = (pageWidth - labelColW) / 7;
 
         const COLOR_SALMON     = [244, 177, 131];
         const COLOR_SALMON_WKD = [252, 228, 214];
@@ -278,23 +376,17 @@ function initTimeTracking() {
 
         let y = margin;
 
-        // Header
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
+        doc.setFont('helvetica', 'bold');   doc.setFontSize(14);
         doc.text('Time Sheet', margin, y);  y += 7;
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
         doc.text(`Freelancer details: ${settings.freelancer || '—'}`, margin, y); y += 5.5;
         doc.text(settings.company || '—', margin, y);                             y += 5.5;
         doc.text(`Year: ${calYear}`, margin, y);                                  y += 5.5;
         doc.text(`Month: ${MONTH_NAMES[calMonth]}`, margin, y);                   y += 9;
 
-        // Column width map — same for every table
         const colStyles = { 0: { cellWidth: labelColW } };
         for (let i = 1; i <= 7; i++) colStyles[i] = { cellWidth: dayColW };
 
-        // Weekly tables
         weeks.forEach(week => {
             const dayRow   = ['Day'];
             const hoursRow = ['Hours'];
@@ -308,43 +400,37 @@ function initTimeTracking() {
             });
 
             doc.autoTable({
-                startY:      y,
-                margin:      { left: margin, right: margin },
-                tableWidth:  pageWidth,
-                head:        [],
-                body:        [dayRow, hoursRow, tasksRow],
-                theme:       'grid',
-                columnStyles: colStyles,
+                startY: y, margin: { left: margin, right: margin },
+                tableWidth: pageWidth, head: [], body: [dayRow, hoursRow, tasksRow],
+                theme: 'grid', columnStyles: colStyles,
                 styles: {
-                    fontSize:    9.5,
-                    cellPadding: { top: 2.5, right: 3, bottom: 2.5, left: 3 },
-                    overflow:    'linebreak',
-                    textColor:   [30, 30, 30],
-                    lineColor:   COLOR_BLACK,
-                    lineWidth:   0.3,
+                    fontSize: 9.5, cellPadding: { top: 1.75, right: 3, bottom: 1.75, left: 3 },
+                    overflow: 'linebreak', textColor: [30, 30, 30],
+                    lineColor: COLOR_BLACK, lineWidth: 0.3,
                 },
                 didParseCell(data) {
                     if (data.column.index === 0) {
-                        data.cell.styles.fontStyle  = 'bold';
-                        data.cell.styles.fillColor  = COLOR_VIOLET;
-                        data.cell.styles.textColor  = COLOR_WHITE;
+                        data.cell.styles.fontStyle = 'bold';
+                        data.cell.styles.fillColor = COLOR_VIOLET;
+                        data.cell.styles.textColor = COLOR_WHITE;
                         return;
                     }
-                    const date      = week[data.column.index - 1];
-                    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                    const hasHours  = (entries[dateKey(date)] || {}).hours > 0;
+                    const date         = week[data.column.index - 1];
+                    const isWeekend    = date.getDay() === 0 || date.getDay() === 6;
+                    const isOtherMonth = date.getMonth() !== calMonth;
+                    const isDimmed     = isWeekend || isOtherMonth;
+                    const hasHours     = (entries[dateKey(date)] || {}).hours > 0;
 
-                    if (data.row.index === 0) {           // Day row
+                    if (data.row.index === 0) {
                         data.cell.styles.fillColor = hasHours ? COLOR_GREY_FILL
-                                                   : isWeekend ? COLOR_SALMON_WKD : COLOR_SALMON;
+                                                   : isDimmed ? COLOR_SALMON_WKD : COLOR_SALMON;
                         data.cell.styles.fontStyle = 'bold';
                         data.cell.styles.halign    = 'center';
-                    } else if (data.row.index === 1) {    // Hours row
-                        data.cell.styles.fillColor = isWeekend ? COLOR_HOURS_WKD : COLOR_HOURS;
+                    } else if (data.row.index === 1) {
+                        data.cell.styles.fillColor = isDimmed ? COLOR_HOURS_WKD : COLOR_HOURS;
                         data.cell.styles.halign    = 'right';
-                    } else {                              // Tasks row
+                    } else {
                         data.cell.styles.fillColor    = COLOR_WHITE;
-                        data.cell.styles.minCellHeight = 12;
                     }
                 },
             });
@@ -352,32 +438,20 @@ function initTimeTracking() {
             y = doc.lastAutoTable.finalY + 5;
         });
 
-        // Total
         const totalHours = weeks.flat().reduce((sum, date) => {
             return sum + ((entries[dateKey(date)] || {}).hours || 0);
         }, 0);
 
         const emptyColW = labelColW + dayColW * 6;
         doc.autoTable({
-            startY:     y,
-            margin:     { left: margin, right: margin },
-            tableWidth: pageWidth,
-            head:       [],
-            body:       [
-                ['', 'Total'],
-                ['', totalHours],
-            ],
+            startY: y, margin: { left: margin, right: margin },
+            tableWidth: pageWidth, head: [],
+            body: [['', 'Total'], ['', totalHours]],
             theme: 'grid',
-            columnStyles: {
-                0: { cellWidth: emptyColW },
-                1: { cellWidth: dayColW },
-            },
+            columnStyles: { 0: { cellWidth: emptyColW }, 1: { cellWidth: dayColW } },
             styles: {
-                fontSize:    9.5,
-                cellPadding: { top: 2.5, right: 3, bottom: 2.5, left: 3 },
-                textColor:   [30, 30, 30],
-                lineColor:   COLOR_BLACK,
-                lineWidth:   0.3,
+                fontSize: 8.5, cellPadding: { top: 1.5, right: 3, bottom: 1.5, left: 3 },
+                textColor: [30, 30, 30], lineColor: COLOR_BLACK, lineWidth: 0.3,
             },
             didParseCell(data) {
                 if (data.column.index === 1) {
