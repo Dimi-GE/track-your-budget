@@ -88,10 +88,9 @@
 /* ── Mobile hamburger button (injected into header) ── */
 .mobile-hamburger {
     display: none;
-    position: absolute;
+    position: fixed;
     right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 7px;
     background: transparent;
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -101,6 +100,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    z-index: 200;
     transition: color 0.15s, border-color 0.15s;
 }
 
