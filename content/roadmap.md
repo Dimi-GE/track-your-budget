@@ -1,26 +1,23 @@
 ## Planned
 
+### Settings View
+App-level configuration: budget year defaults, currency symbol, theme options. Currently a disabled sidebar item.
+
+### Onboarding
+Guided introduction to the app covering the data entry workflow, what Flow means, and how the analytics build on committed data.
+
+## In Progress
+
+### Mobile View Adaptation
+Re-arrange web page components for proper rendering on mobile devices.
+
+## Backlog
+
 ### Transactions View
 Dedicated full-screen transaction history, separate from the Dashboard panel. Currently a disabled sidebar item.
 
 ### Home View
 Live KPI cards pulling from committed data. Spending trend mini-chart. Recent transactions panel. Currently a visual placeholder.
-
-### Onboarding
-Guided introduction to the app covering the data entry workflow, what Flow means, and how the analytics build on committed data.
-
-### Settings View
-App-level configuration: budget year defaults, currency symbol, theme options. Currently a disabled sidebar item.
-
-## In Progress
-
-### PDF: Time Tracking Export
-One-click time tracking report export.
-
-### Time Tracking View
-Shell created with timer, sessions list, and weekly bar chart. Data model and purpose to be defined.
-
-## Ideas
 
 ### HackMD Integration
 Pull document content from the HackMD API. Edit docs collaboratively online, see them reflected in the app automatically without touching code.
@@ -47,6 +44,12 @@ Ability to make custom widgets/sections (board constructor?).
 Ability to use agentic LLM via API key.
 
 ## Done
+
+### PDF: Time Tracking Export
+One-click time tracking report export.
+
+### Time Tracking View
+Shell created with calendar, timer, sessions list, and weekly bar chart. Data model and purpose to be defined.
 
 ### Roadmap View
 Structure built. Content now driven by markdown files via the engine.

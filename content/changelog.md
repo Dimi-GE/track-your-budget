@@ -1,3 +1,21 @@
+## v0.0.1c.5 — June 2026
+
+- `feature` Home view — KPI row with Total Saved, Monthly Income, Monthly Expenses, and Cash Flow cards populated from committed data
+- `feature` Home view — Spending Trend panel: mini line chart of expenses across the last 6 months
+- `feature` Home view — Recent Transactions panel: 5 most recent committed entries with category colours matching the dashboard palette
+- `feature` Home view — Expense Breakdown panel: donut chart of current month expenses by category
+- `feature` Home view — Financial Health panel replacing Savings Goals: three ratio bars (Savings Rate, Expense Ratio, Rent Burden) with colour-coded status and threshold hints
+- `improvement` Financial Health — bars fall back to the most recent month with income when the current month has none yet; panel header shows the reference period
+- `improvement` TX_CATEGORY_COLORS, getCategoryColor, TX_TYPE_ICONS, and TX_TYPE_COLORS moved to app.js so they are globally available regardless of which view is active first
+
+## v0.0.1c.4 — June 2026
+
+- `improvement` Recent Transactions — date, type, amount, and category columns are fixed-width for consistent spreadsheet-like alignment
+- `improvement` Recent Transactions — notes rendered inline on the same row as the transaction, offset from the category badge
+- `improvement` Recent Transactions — category badges coloured to match the Expenses by Category chart palette; income and savings categories have their own distinct colours
+- `improvement` Recent Transactions — transaction type shows a coloured icon (trending-up for Income, coin for Savings, trending-down for Expenses)
+- `parked` Transactions view hidden from sidebar navigation pending future development
+
 ## v0.0.1c.3 — June 2026
 
 - `feature` Time Tracking — Submit button wires timer to the calendar: submitting a session adds hours and task label to today's calendar entry, the Today list, and the This Week bars

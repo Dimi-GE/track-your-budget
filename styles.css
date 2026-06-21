@@ -55,6 +55,19 @@ body {
     }
 }
 
+@media (hover: none) and (pointer: coarse) {
+    .window-wrapper {
+        grid-template-columns: 0 1fr;
+    }
+    .sidebar-container {
+        display: none;
+    }
+    .header-container,
+    .content-container {
+        grid-column: 1 / -1;
+    }
+}
+
 .content-container {
     grid-column: 2;
     grid-row: 2;

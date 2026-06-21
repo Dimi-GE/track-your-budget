@@ -7,32 +7,32 @@
 
     <!-- KPI Row -->
     <div class="home-kpi-row">
-        <div class="home-card home-card--placeholder">
-            <div class="home-card__icon"><i class="ti ti-wallet"></i></div>
+        <div class="home-card">
+            <div class="home-card__icon"><i class="ti ti-coin"></i></div>
             <div class="home-card__body">
-                <span class="home-card__label">Net Worth</span>
-                <span class="home-card__value placeholder-block"></span>
+                <span class="home-card__label">Total Saved</span>
+                <span class="home-card__value" id="home-total-saved">--</span>
             </div>
         </div>
-        <div class="home-card home-card--placeholder">
+        <div class="home-card">
             <div class="home-card__icon"><i class="ti ti-trending-up"></i></div>
             <div class="home-card__body">
                 <span class="home-card__label">Monthly Income</span>
-                <span class="home-card__value placeholder-block"></span>
+                <span class="home-card__value" id="home-monthly-income">--</span>
             </div>
         </div>
-        <div class="home-card home-card--placeholder">
+        <div class="home-card">
             <div class="home-card__icon"><i class="ti ti-trending-down"></i></div>
             <div class="home-card__body">
                 <span class="home-card__label">Monthly Expenses</span>
-                <span class="home-card__value placeholder-block"></span>
+                <span class="home-card__value" id="home-monthly-expenses">--</span>
             </div>
         </div>
-        <div class="home-card home-card--placeholder">
+        <div class="home-card">
             <div class="home-card__icon"><i class="ti ti-cash"></i></div>
             <div class="home-card__body">
                 <span class="home-card__label">Cash Flow</span>
-                <span class="home-card__value placeholder-block"></span>
+                <span class="home-card__value" id="home-cash-flow">--</span>
             </div>
         </div>
     </div>
@@ -40,58 +40,79 @@
     <!-- Main content grid -->
     <div class="home-grid">
 
-        <div class="home-panel home-panel--placeholder">
+        <div class="home-panel">
             <div class="home-panel__header">
                 <i class="ti ti-chart-line"></i>
                 <span>Spending Trend</span>
             </div>
-            <div class="home-panel__body">
-                <div class="placeholder-chart"></div>
+            <div class="home-panel__body home-panel__body--chart">
+                <canvas id="home-trend-chart"></canvas>
             </div>
         </div>
 
-        <div class="home-panel home-panel--placeholder">
+        <div class="home-panel">
             <div class="home-panel__header">
                 <i class="ti ti-list"></i>
                 <span>Recent Transactions</span>
             </div>
             <div class="home-panel__body home-panel__body--list">
-                <div class="placeholder-row"></div>
-                <div class="placeholder-row"></div>
-                <div class="placeholder-row"></div>
-                <div class="placeholder-row"></div>
-                <div class="placeholder-row"></div>
+                <div id="home-tx-list"></div>
             </div>
         </div>
 
-        <div class="home-panel home-panel--placeholder">
+        <div class="home-panel">
             <div class="home-panel__header">
                 <i class="ti ti-chart-donut"></i>
                 <span>Expense Breakdown</span>
             </div>
             <div class="home-panel__body home-panel__body--center">
-                <div class="placeholder-donut"></div>
+                <div class="home-donut-wrap">
+                    <canvas id="home-donut-chart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="home-panel home-panel--placeholder">
+        <div class="home-panel">
             <div class="home-panel__header">
-                <i class="ti ti-target"></i>
-                <span>Savings Goals</span>
+                <i class="ti ti-heart-rate"></i>
+                <span>Financial Health</span>
+                <span class="home-panel__period" id="home-health-period"></span>
             </div>
             <div class="home-panel__body home-panel__body--list">
-                <div class="placeholder-goal">
-                    <div class="placeholder-goal__label"></div>
-                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:62%"></div></div>
+
+                <div class="health-bar-item">
+                    <div class="health-bar-item__header">
+                        <span class="health-bar-item__label">Savings Rate</span>
+                        <span class="health-bar-item__value" id="home-savings-rate-val">--</span>
+                    </div>
+                    <div class="health-bar-item__track">
+                        <div class="health-bar-item__fill" id="home-savings-rate-fill"></div>
+                    </div>
+                    <span class="health-bar-item__hint">Target: save ≥ 20% of income</span>
                 </div>
-                <div class="placeholder-goal">
-                    <div class="placeholder-goal__label"></div>
-                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:38%"></div></div>
+
+                <div class="health-bar-item">
+                    <div class="health-bar-item__header">
+                        <span class="health-bar-item__label">Expense Ratio</span>
+                        <span class="health-bar-item__value" id="home-expense-ratio-val">--</span>
+                    </div>
+                    <div class="health-bar-item__track">
+                        <div class="health-bar-item__fill" id="home-expense-ratio-fill"></div>
+                    </div>
+                    <span class="health-bar-item__hint">Ceiling: keep expenses under 80% of income</span>
                 </div>
-                <div class="placeholder-goal">
-                    <div class="placeholder-goal__label"></div>
-                    <div class="placeholder-goal__bar"><div class="placeholder-goal__fill" style="width:81%"></div></div>
+
+                <div class="health-bar-item">
+                    <div class="health-bar-item__header">
+                        <span class="health-bar-item__label">Rent Burden</span>
+                        <span class="health-bar-item__value" id="home-rent-burden-val">--</span>
+                    </div>
+                    <div class="health-bar-item__track">
+                        <div class="health-bar-item__fill" id="home-rent-burden-fill"></div>
+                    </div>
+                    <span class="health-bar-item__hint">Ceiling: keep rent under 30% of income</span>
                 </div>
+
             </div>
         </div>
 
