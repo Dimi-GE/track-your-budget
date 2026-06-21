@@ -20,7 +20,7 @@ function initSettings() {
     function doReset() {
         ['dashboard_committed', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings']
             .forEach(k => localStorage.removeItem(k));
-        sessionStorage.removeItem('activeView');
+        sessionStorage.setItem('activeView', 'home');
         location.reload();
     }
 
