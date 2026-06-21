@@ -11,11 +11,6 @@ Re-arrange web page components for proper rendering on mobile devices.
 
 ## In Progress
 
-### PDF: Time Tracking Export
-One-click time tracking report export.
-
-### Time Tracking View
-Shell created with calendar, timer, sessions list, and weekly bar chart. Data model and purpose to be defined.
 
 ## Backlog
 
@@ -50,6 +45,12 @@ Ability to make custom widgets/sections (board constructor?).
 Ability to use agentic LLM via API key.
 
 ## Done
+
+### PDF: Time Tracking Export
+One-click time tracking report export.
+
+### Time Tracking View
+Shell created with calendar, timer, sessions list, and weekly bar chart. Data model and purpose to be defined.
 
 ### Roadmap View
 Structure built. Content now driven by markdown files via the engine.

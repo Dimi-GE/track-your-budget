@@ -71,6 +71,19 @@
     letter-spacing: 0.04em;
 }
 
+.home-card__value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.home-card__value--negative {
+    color: #e05c5c;
+}
+
 /* Main grid */
 .home-grid {
     display: grid;
@@ -105,6 +118,13 @@
     color: var(--accent);
 }
 
+.home-panel__period {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
 .home-panel__body {
     padding: 16px;
 }
@@ -119,6 +139,111 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Chart panel body */
+.home-panel__body--chart {
+    height: 140px;
+    padding: 12px 16px;
+}
+
+/* Transaction list */
+.home-tx-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.home-tx-item:last-child {
+    border-bottom: none;
+}
+
+.home-tx-date {
+    color: var(--text-muted);
+    flex-shrink: 0;
+    width: 82px;
+}
+
+.home-tx-cat {
+    color: var(--text-muted);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-tx-amount {
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.home-tx-amount--income   { color: #4caf7d; }
+.home-tx-amount--expenses { color: #e05c5c; }
+.home-tx-amount--savings  { color: #4fc3f7; }
+
+/* Donut chart */
+.home-donut-wrap {
+    width: 160px;
+    height: 160px;
+    position: relative;
+}
+
+/* Financial health bars */
+.health-bar-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.health-bar-item__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.health-bar-item__label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.health-bar-item__value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.health-bar-item__track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.health-bar-item__fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    transition: width 0.45s ease;
+}
+
+.health-bar-item__fill[data-status="good"] { background: #4caf7d; }
+.health-bar-item__fill[data-status="warn"] { background: #f5a800; }
+.health-bar-item__fill[data-status="bad"]  { background: #e05c5c; }
+
+.health-bar-item__hint {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Empty / no-data state */
+.home-no-data {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 20px 0;
 }
 
 /* Placeholder shimmer */
