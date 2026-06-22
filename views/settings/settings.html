@@ -3,6 +3,25 @@
         <div class="section-title">Data</div>
         <div class="settings-card">
             <div class="settings-card-body">
+                <div class="settings-item-label">Backup All Data</div>
+                <div class="settings-item-desc">Downloads a full snapshot of all dashboard entries, time tracking records, and preferences as a single JSON file.</div>
+            </div>
+            <div class="settings-item-action">
+                <button class="btn-backup" id="btn-backup">Backup</button>
+            </div>
+        </div>
+        <div class="settings-card">
+            <div class="settings-card-body">
+                <div class="settings-item-label">Restore from Backup</div>
+                <div class="settings-item-desc">Replaces all current data with a previously exported backup file. This cannot be undone.</div>
+            </div>
+            <div class="settings-item-action" id="restore-action">
+                <button class="btn-restore" id="btn-restore">Restore</button>
+                <input type="file" id="input-restore" accept=".json" style="display:none">
+            </div>
+        </div>
+        <div class="settings-card">
+            <div class="settings-card-body">
                 <div class="settings-item-label">Reset All Data</div>
                 <div class="settings-item-desc">Clears all financial entries, time tracking records, and saved preferences. This cannot be undone.</div>
             </div>

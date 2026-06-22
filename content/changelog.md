@@ -1,3 +1,15 @@
+## v0.0.1c.7 — June 2026
+
+- `feature` Settings — Backup All Data action downloads a full snapshot of all dashboard entries, time tracking records, and preferences as a single dated JSON file
+- `feature` Settings — Restore from Backup action reads a backup JSON file and replaces all current data; requires a file-picker confirm step before overwriting
+- `feature` Time Tracking — month total row added below the calendar showing cumulative hours for the displayed month; updates on every render including month navigation
+- `feature` Time Tracking — calendar Export JSON and Import JSON actions for sharing data across devices; export covers all entries and sessions, import does a full replace then re-renders
+- `improvement` Time Tracking — Export JSON, Import JSON, and Export PDF buttons consolidated into a collapsible file-ops panel behind a single toggle button, matching the dashboard pattern and fixing overflow on narrow mobile screens
+- `improvement` Settings — Backup, Restore, and Reset share a single STORAGE_KEYS array so adding new views keeps all three actions in sync automatically
+- `fix` Mobile — `100dvh` added alongside `100vh` on body, window wrapper, and mobile drawer to correct content clipping caused by browser chrome on iOS Safari and Android
+- `fix` Loading — full-screen overlay with spinner shown on initial page load, fades out after 2 seconds, preventing section-by-section flash of unstyled content on first paint
+- `fix` View transitions — `loadCSS()` converted to return a Promise; HTML is now injected only after the view stylesheet has fully loaded, eliminating per-view flash of unstyled content on first visit
+
 ## v0.0.1c.6 — June 2026
 
 - `feature` Mobile navigation — sidebar hidden on touch devices; hamburger button (fixed, top-right) opens a slide-in drawer with full nav labels; backdrop tap closes it

@@ -237,6 +237,13 @@ function initTimeTracking() {
 
         calLabel.textContent = `${MONTH_NAMES[calMonth]} ${calYear}`;
 
+        const prefix = `${calYear}-${pad(calMonth + 1)}-`;
+        const monthTotalHours = Object.entries(entries)
+            .filter(([k]) => k.startsWith(prefix))
+            .reduce((sum, [, e]) => sum + (e.hours || 0), 0);
+        const monthTotalEl = document.getElementById('tt-month-total');
+        if (monthTotalEl) monthTotalEl.textContent = `${monthTotalHours}h`;
+
         const headers = WEEKDAY_LABELS.map(d => `<div class="tt-cal-weekday">${d}</div>`).join('');
         let daysHtml  = '';
 
@@ -282,6 +289,54 @@ function initTimeTracking() {
     btnCalNext.addEventListener('click', () => {
         if (++calMonth > 11) { calMonth = 0; calYear++; }
         renderCalendar();
+    });
+
+    // ── File panel toggle ──────────────────────────────────────────────────
+    const fileToggle = document.getElementById('tt-file-toggle');
+    const filePanel  = document.getElementById('tt-file-panel');
+
+    fileToggle.addEventListener('click', () => {
+        const isOpen = filePanel.classList.toggle('open');
+        fileToggle.classList.toggle('active', isOpen);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (filePanel.classList.contains('open') &&
+            !filePanel.contains(e.target) &&
+            e.target !== fileToggle) {
+            filePanel.classList.remove('open');
+            fileToggle.classList.remove('active');
+        }
+    });
+
+    // ── Calendar JSON export ───────────────────────────────────────────────
+    document.getElementById('tt-export-json').addEventListener('click', () => {
+        const data = { entries: loadEntries(), sessions: loadSessions() };
+        const filename = `timesheet-${calYear}-${pad(calMonth + 1)}.json`;
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    // ── Calendar JSON import ───────────────────────────────────────────────
+    document.getElementById('tt-import-json').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                if (data.entries)  saveEntries(data.entries);
+                if (data.sessions) saveSessions(data.sessions);
+                renderCalendar();
+                renderWeekBars();
+                renderTodaySessions();
+            } catch (err) { console.error('Import failed:', err); }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
     });
 
     renderCalendar();

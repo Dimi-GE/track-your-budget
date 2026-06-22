@@ -10,6 +10,11 @@
     <link rel="stylesheet" href="layers/header/header.css">
 </head>
 <body>
+    <div id="app-loader" style="position:fixed;inset:0;background:#0a0a0f;z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">
+        <div style="font-family:Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;letter-spacing:0.1em;">Financial Dashboard</div>
+        <div id="loader-ring" style="width:28px;height:28px;border:2px solid #1e1e2e;border-top-color:#f5a800;border-radius:50%;"></div>
+    </div>
+
     <div class="window-wrapper">
         <div id="sidebar" class="sidebar-container"></div>
         <div id="header" class="header-container"></div>

@@ -30,6 +30,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--app-bg);
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -39,6 +40,7 @@ body {
     width: 100%;
     max-width: 1280px;
     height: 100vh;
+    height: 100dvh;
     display: grid;
     grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-rows: var(--header-height) 1fr;
@@ -80,7 +82,20 @@ body {
     padding: 20px;
 }
 
-/* Global scrollbar styling */
+/* ── Loading overlay ── */
+#app-loader {
+    transition: opacity 0.4s ease;
+}
+
+@keyframes loader-spin {
+    to { transform: rotate(360deg); }
+}
+
+#loader-ring {
+    animation: loader-spin 0.75s linear infinite;
+}
+
+/* ── Global scrollbar styling ── */
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--card-border) var(--card-bg);

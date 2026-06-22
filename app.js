@@ -62,9 +62,10 @@ function loadView(viewName) {
         })
         .then(html => {
             loadedViews[viewName] = { html };
-            contentContainer.innerHTML = html;
-            loadCSS(`views/${viewName}/${viewName}.css`);
-            return loadScript(`views/${viewName}/${viewName}.js`);
+            return loadCSS(`views/${viewName}/${viewName}.css`).then(() => {
+                contentContainer.innerHTML = html;
+                return loadScript(`views/${viewName}/${viewName}.js`);
+            });
         })
         .then(() => {
             const initFn = `init${capitalize(viewName)}`;
@@ -85,11 +86,15 @@ function loadView(viewName) {
 }
 
 function loadCSS(href) {
-    if (document.querySelector(`link[href="${href}"]`)) return;
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.appendChild(link);
+    return new Promise((resolve) => {
+        if (document.querySelector(`link[href="${href}"]`)) { resolve(); return; }
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.onload  = resolve;
+        link.onerror = resolve;
+        document.head.appendChild(link);
+    });
 }
 
 function loadScript(src) {
@@ -110,4 +115,12 @@ function capitalize(str) {
 document.addEventListener('DOMContentLoaded', () => {
     const saved = sessionStorage.getItem('activeView');
     loadView(saved || 'home');
+
+    const loader = document.getElementById('app-loader');
+    if (loader) {
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            loader.addEventListener('transitionend', () => loader.remove(), { once: true });
+        }, 2000);
+    }
 });

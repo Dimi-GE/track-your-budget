@@ -48,11 +48,29 @@
                 <span class="tt-cal-month-label" id="tt-cal-label"></span>
                 <button class="tt-cal-arrow" id="tt-cal-next">&#8250;</button>
             </div>
-            <button class="tt-export-btn" id="tt-export-pdf">
-                <i class="ti ti-file-type-pdf"></i> Export PDF
-            </button>
+            <div class="tt-file-ops">
+                <div class="tt-file-panel" id="tt-file-panel">
+                    <button class="tt-export-btn" id="tt-export-json">
+                        <i class="ti ti-download"></i> Export JSON
+                    </button>
+                    <label class="tt-export-btn tt-import-label">
+                        <i class="ti ti-upload"></i> Import JSON
+                        <input type="file" id="tt-import-json" accept=".json" style="display:none">
+                    </label>
+                    <button class="tt-export-btn" id="tt-export-pdf">
+                        <i class="ti ti-file-type-pdf"></i> Export PDF
+                    </button>
+                </div>
+                <button class="tt-file-toggle" id="tt-file-toggle" title="File options">
+                    <i class="ti ti-file-export"></i>
+                </button>
+            </div>
         </div>
         <div class="tt-calendar" id="tt-calendar"></div>
+        <div class="tt-month-total">
+            <span class="tt-month-total-label">Total this month</span>
+            <span class="tt-month-total-value" id="tt-month-total">0h</span>
+        </div>
     </div>
 
     <!-- Today's sessions -->
