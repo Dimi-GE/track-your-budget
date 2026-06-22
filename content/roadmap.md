@@ -1,11 +1,5 @@
 ## Planned
 
-### Calendar Manual Sync (Import/Export)
-An option for sharing data across devices in case local storage is cleaned on browser exit.
-
-### Overall Data Export
-An option export/import data across devices in case local storage is cleaned on browser exit.
-
 ### Settings — Extended Configuration
 Additional settings: budget year defaults, currency symbol, theme options.
 
@@ -45,6 +39,12 @@ Ability to make custom widgets/sections (board constructor?).
 Ability to use agentic LLM via API key.
 
 ## Done
+
+### Calendar Manual Sync (Import/Export)
+An option for sharing data across devices in case local storage is cleaned on browser exit.
+
+### Overall Data Export
+An option export/import data across devices in case local storage is cleaned on browser exit.
 
 ### Per-view Documentation
 FEATURES.md and ANALYTICS.md covering each view in detail. Authoring convention defined for both cards and docs rendering modes.

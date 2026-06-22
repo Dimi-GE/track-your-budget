@@ -594,6 +594,39 @@
 }
 .tt-modal-btn--save:hover { opacity: 0.88; }
 
+/* ── Month total ─────────────────────────────── */
+.tt-month-total {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.tt-month-total-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.tt-month-total-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ── Calendar action group ───────────────────── */
+.tt-cal-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tt-import-label {
+    cursor: pointer;
+}
+
 /* ── Placeholder shimmer ──────────────────────── */
 @keyframes shimmer {
     0%   { opacity: 0.35; }

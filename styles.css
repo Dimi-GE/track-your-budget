@@ -30,6 +30,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: var(--app-bg);
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -39,6 +40,7 @@ body {
     width: 100%;
     max-width: 1280px;
     height: 100vh;
+    height: 100dvh;
     display: grid;
     grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-rows: var(--header-height) 1fr;
