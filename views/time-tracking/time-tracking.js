@@ -25,7 +25,6 @@ function initTimeTracking() {
 
     const MONTH_NAMES    = ['January','February','March','April','May','June',
                             'July','August','September','October','November','December'];
-    const WEEKDAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     const now            = new Date();
 
     // ── Storage helpers ────────────────────────────────────────────────────
@@ -40,12 +39,6 @@ function initTimeTracking() {
     const btnStart   = document.getElementById('tt-btn-start');
     const btnSubmit  = document.getElementById('tt-btn-submit');
     const sessionLbl = document.getElementById('tt-session-label');
-    const todayLabel = document.getElementById('tt-today-label');
-
-    todayLabel.textContent = now.toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-    });
-
     let running   = false;
     let startTime = null;
     let elapsed   = 0;
@@ -91,13 +84,6 @@ function initTimeTracking() {
         const todayKey   = dateKey(new Date());
         const label      = sessionLbl.value.trim();
         const hours      = Math.round((durationMs / 3600000) * 100) / 100;
-        const timeStr    = `${pad(new Date().getHours())}:${pad(new Date().getMinutes())}`;
-
-        // Save individual session
-        const sessions   = loadSessions();
-        if (!sessions[todayKey]) sessions[todayKey] = [];
-        sessions[todayKey].push({ label, durationMs, time: timeStr });
-        saveSessions(sessions);
 
         // Merge into calendar entry
         const entries    = loadEntries();
@@ -112,74 +98,8 @@ function initTimeTracking() {
         sessionLbl.value = '';
 
         // Re-render
-        renderTodaySessions();
-        renderWeekBars();
         renderCalendar();
     });
-
-    // ── Today's sessions ───────────────────────────────────────────────────
-    const sessionsList = document.getElementById('tt-sessions-list');
-    const dayTotalEl   = document.getElementById('tt-day-total');
-
-    function renderTodaySessions() {
-        const todayKey = dateKey(new Date());
-        const sessions = (loadSessions()[todayKey] || []);
-
-        if (sessions.length === 0) {
-            sessionsList.innerHTML = '<div class="tt-empty">No sessions recorded today</div>';
-            dayTotalEl.textContent = '0h 00m';
-            return;
-        }
-
-        sessionsList.innerHTML = sessions.map(s => `
-            <div class="tt-session-row">
-                <span class="tt-session-row-label">${s.label || '—'}</span>
-                <span class="tt-session-row-time">${s.time}</span>
-                <span class="tt-session-row-duration">${formatShort(s.durationMs)}</span>
-            </div>
-        `).join('');
-
-        const totalMs = sessions.reduce((sum, s) => sum + s.durationMs, 0);
-        dayTotalEl.textContent = formatShort(totalMs);
-    }
-
-    renderTodaySessions();
-
-    // ── This Week bars ─────────────────────────────────────────────────────
-    const weekGrid = document.getElementById('tt-week-grid');
-
-    function getWeekDays() {
-        const d   = new Date();
-        const dow = d.getDay(); // 0=Sun
-        const toMon = dow === 0 ? -6 : 1 - dow;
-        return Array.from({ length: 7 }, (_, i) => {
-            const day = new Date(d.getFullYear(), d.getMonth(), d.getDate() + toMon + i);
-            return day;
-        });
-    }
-
-    function renderWeekBars() {
-        const entries = loadEntries();
-        const days    = getWeekDays();
-        const hours   = days.map(d => (entries[dateKey(d)] || {}).hours || 0);
-        const max     = Math.max(...hours, 1);
-
-        weekGrid.innerHTML = days.map((day, i) => {
-            const pct   = Math.round((hours[i] / max) * 100);
-            const label = WEEKDAY_LABELS[i];
-            const val   = hours[i] > 0 ? `${hours[i]}h` : '';
-            return `
-                <div class="tt-week-day">
-                    <span class="tt-week-day-label">${label}</span>
-                    <div class="tt-week-bar-wrap">
-                        <div class="tt-week-bar" style="height:${pct}%"></div>
-                    </div>
-                    <span class="tt-week-day-value">${val}</span>
-                </div>`;
-        }).join('');
-    }
-
-    renderWeekBars();
 
     // ── Settings ───────────────────────────────────────────────────────────
     const freelancerInput = document.getElementById('tt-freelancer');
@@ -244,7 +164,7 @@ function initTimeTracking() {
         const monthTotalEl = document.getElementById('tt-month-total');
         if (monthTotalEl) monthTotalEl.textContent = `${monthTotalHours}h`;
 
-        const headers = WEEKDAY_LABELS.map(d => `<div class="tt-cal-weekday">${d}</div>`).join('');
+        const headers = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => `<div class="tt-cal-weekday">${d}</div>`).join('');
         let daysHtml  = '';
 
         weeks.forEach(week => {
@@ -331,8 +251,6 @@ function initTimeTracking() {
                 if (data.entries)  saveEntries(data.entries);
                 if (data.sessions) saveSessions(data.sessions);
                 renderCalendar();
-                renderWeekBars();
-                renderTodaySessions();
             } catch (err) { console.error('Import failed:', err); }
         };
         reader.readAsText(file);
@@ -380,7 +298,6 @@ function initTimeTracking() {
         saveEntries(entries);
         closeModal();
         renderCalendar();
-        renderWeekBars();
     });
 
     btnModalDel.addEventListener('click', () => {
@@ -390,7 +307,6 @@ function initTimeTracking() {
         saveEntries(entries);
         closeModal();
         renderCalendar();
-        renderWeekBars();
     });
 
     btnModalCanc.addEventListener('click', closeModal);

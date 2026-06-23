@@ -2,8 +2,13 @@
 
 - `fix` Loading — per-view spinner replaces the former full-screen overlay; spinner appears inside the content area on first visit to each view and lifts only when the view signals it is fully rendered, preventing content flash across all views
 - `fix` Loading — `window.viewReady()` callback introduced; each view's init function calls it at the natural end of its async work (after charts render, sub-components load, and markdown fetches complete) so the spinner duration is tied to actual content readiness rather than a fixed timeout
+- `fix` Loading — 350ms fallback timeout added to force-remove the overlay when `transitionend` does not fire; prevents the invisible overlay from blocking pointer events on synchronously-initialised views such as Hours Reports
 - `improvement` Loading — load time logged to console per view (`[viewName] ready in Xms`) to aid performance profiling
 - `improvement` Loading — 8-second safety timeout auto-dismisses the spinner if a view's init never signals ready, preventing the overlay from hanging indefinitely
+- `improvement` Hours Reports — view renamed from Time Tracking across all user-facing labels, navigation, view title, changelog, and roadmap entries; internal file paths unchanged
+- `improvement` Hours Reports — Today and This Week sections removed; view now focuses on the monthly calendar and timer only
+- `docs` HOME.md added covering KPI row, reference month logic, Spending Trend, Recent Transactions, Expense Breakdown, and Financial Health panels
+- `docs` HOURS.md added covering Timesheet Settings, Timer, Calendar, Day Entry Modal, and File Operations
 
 ## v0.0.1c.7 — June 2026
 
