@@ -523,4 +523,6 @@ function initTimeTracking() {
 
         doc.save(`${calYear}_${MONTH_NAMES[calMonth]}_TimeSheet.pdf`);
     }
+
+    window.viewReady?.();
 }

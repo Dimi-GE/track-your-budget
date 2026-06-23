@@ -225,5 +225,6 @@ function initDashboard() {
         .then(() => {
             initTxHistory();
             loadFromStorage();
+            window.viewReady?.();
         });
 }

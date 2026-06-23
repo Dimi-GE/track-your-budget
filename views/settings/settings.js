@@ -79,4 +79,5 @@ function initSettings() {
     }
 
     showResetButton();
+    window.viewReady?.();
 }

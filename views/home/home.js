@@ -155,6 +155,7 @@ function initHome() {
         .then(() => {
             homeTrendChart = renderHomeTrend(entries);
             homeDonutChart = renderHomeDonut(monthEntries, EXPENSE_CATS);
+            window.viewReady?.();
         });
 }
 

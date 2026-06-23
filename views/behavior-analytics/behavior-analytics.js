@@ -36,6 +36,7 @@ function initBehaviorAnalytics() {
             initEarningsHeatmap();
             initTrends();
             initForecasting();
+            window.viewReady?.();
         });
     });
 }

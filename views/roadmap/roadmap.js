@@ -17,8 +17,9 @@ function initRoadmap() {
 
     loadScript('engine/markdown.js')
         .then(() => loadMarkdownEngine())
-        .then(() => {
-            renderMarkdownAsCards('content/changelog.md', changelogEl, { layout: 'timeline' });
-            renderMarkdownAsCards('content/roadmap.md',   roadmapEl,   { layout: 'columns'  });
-        });
+        .then(() => Promise.all([
+            renderMarkdownAsCards('content/changelog.md', changelogEl, { layout: 'timeline' }),
+            renderMarkdownAsCards('content/roadmap.md',   roadmapEl,   { layout: 'columns'  }),
+        ]))
+        .then(() => window.viewReady?.());
 }
