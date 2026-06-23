@@ -83,6 +83,7 @@ function loadView(viewName) {
                     if (!overlay.isConnected) return;
                     overlay.style.opacity = '0';
                     overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
+                    setTimeout(() => { if (overlay.isConnected) overlay.remove(); }, 350);
                     window.viewReady = null;
                 };
 
