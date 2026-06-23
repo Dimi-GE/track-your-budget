@@ -53,7 +53,7 @@ function loadView(viewName) {
         return;
     }
 
-    contentContainer.innerHTML = '<div style="text-align:center;padding:50px;color:#fff;">Loading...</div>';
+    contentContainer.innerHTML = '<div style="height:calc(100dvh - var(--header-height) - 40px);display:flex;align-items:center;justify-content:center;"><div id="loader-ring" style="width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;"></div></div>';
 
     fetch(`views/${viewName}/${viewName}.html`)
         .then(response => {
@@ -115,12 +115,4 @@ function capitalize(str) {
 document.addEventListener('DOMContentLoaded', () => {
     const saved = sessionStorage.getItem('activeView');
     loadView(saved || 'home');
-
-    const loader = document.getElementById('app-loader');
-    if (loader) {
-        setTimeout(() => {
-            loader.style.opacity = '0';
-            loader.addEventListener('transitionend', () => loader.remove(), { once: true });
-        }, 2000);
-    }
 });

@@ -82,11 +82,7 @@ body {
     padding: 20px;
 }
 
-/* ── Loading overlay ── */
-#app-loader {
-    transition: opacity 0.4s ease;
-}
-
+/* ── View loader ── */
 @keyframes loader-spin {
     to { transform: rotate(360deg); }
 }
