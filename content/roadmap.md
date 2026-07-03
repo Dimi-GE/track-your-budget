@@ -1,7 +1,7 @@
 ## Planned
 
 ### Settings — Extended Configuration
-Additional settings: budget year defaults, currency symbol, theme options.
+Additional settings: GitHub Gist Sync, currency symbol.
 
 ### Onboarding
 Guided introduction to the app covering the data entry workflow, what Flow means, and how the analytics build on committed data.

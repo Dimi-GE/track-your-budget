@@ -63,7 +63,7 @@ function initSpendingHeatmap() {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 (JSON.parse(raw).entries || [])
-                    .filter(e => e.type === 'expenses')
+                    .filter(e => e.type === 'expenses' && !isSavingsWithdrawal(e))
                     .forEach(e => {
                         if (!e.date) return;
                         const d = new Date(e.date + 'T00:00:00');

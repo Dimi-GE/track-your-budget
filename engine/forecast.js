@@ -10,7 +10,10 @@ function buildForecast(entries, startMonth, startYear) {
         if (!e.date || !e.type || !TYPES.includes(e.type)) return;
         const key = e.date.slice(0, 7);
         if (!byMonth[key]) byMonth[key] = { income: 0, expenses: 0, savings: 0 };
-        byMonth[key][e.type] += e.amount;
+        // A "Savings" expense is a reserve withdrawal: net it out of savings
+        // rather than counting it as an expense.
+        if (isSavingsWithdrawal(e)) byMonth[key].savings -= e.amount;
+        else byMonth[key][e.type] += e.amount;
     });
 
     const now = new Date();

@@ -85,8 +85,11 @@ function initTrends() {
                 return d >= p.start && d <= p.end;
             });
             const inc = inRange.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-            const exp = inRange.filter(e => e.type === 'expenses').reduce((s, e) => s + e.amount, 0);
-            const sav = inRange.filter(e => e.type === 'savings').reduce((s, e) => s + e.amount, 0);
+            const exp = inRange.filter(e => e.type === 'expenses' && !isSavingsWithdrawal(e)).reduce((s, e) => s + e.amount, 0);
+            // Savings is net of reserve withdrawals (Expenses / category 'savings').
+            const sav = inRange.reduce((s, e) =>
+                e.type === 'savings'   ? s + e.amount :
+                isSavingsWithdrawal(e) ? s - e.amount : s, 0);
             income.push(inc);
             expenses.push(exp);
             savings.push(sav);

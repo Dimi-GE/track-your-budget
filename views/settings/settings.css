@@ -133,3 +133,82 @@
     color: var(--text-primary);
     border-color: var(--text-muted);
 }
+
+/* ── Gist remote backup ──────────────────────────────────────────────── */
+.gist-card {
+    align-items: flex-start;
+}
+
+.gist-card .settings-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.gist-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 14px;
+    max-width: 380px;
+}
+
+.gist-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.gist-field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+.gist-input {
+    background: var(--bg, #1a1a1a);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    transition: border-color 0.15s;
+}
+
+.gist-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.gist-input:disabled {
+    color: var(--text-muted);
+    background: transparent;
+    cursor: default;
+}
+
+.gist-status {
+    margin-top: 12px;
+    font-size: 12px;
+    min-height: 16px;
+}
+
+.gist-status.connected { color: var(--positive, #66bb6a); }
+.gist-status.error     { color: var(--negative); }
+
+.btn-gist-disconnect {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 18px;
+    font-size: 13px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+}
+
+.btn-gist-disconnect:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+}

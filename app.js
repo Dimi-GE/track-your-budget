@@ -17,12 +17,22 @@ const TX_CATEGORY_COLORS = {
     gifts:          '#ce93d8',
     transport:      '#80cbc4',
     personal:       '#fff176',
+    // Expenses — reserve drawdown (Expenses type, "Savings" category)
+    savings:        '#5c6bc0',
     // Fallback
     other:          '#90a4ae',
 };
 
 function getCategoryColor(category) {
     return TX_CATEGORY_COLORS[category] || TX_CATEGORY_COLORS.other;
+}
+
+// A "Savings" expense is a withdrawal from the reserve — it nets down the
+// Savings balance and is NOT consumption of income. Every aggregation of
+// expenses/savings across the app routes through this so the semantics stay
+// consistent. See DASHBOARD.md / HOME.md.
+function isSavingsWithdrawal(entry) {
+    return entry.type === 'expenses' && entry.category === 'savings';
 }
 
 const TX_TYPE_ICONS = {
@@ -129,7 +139,14 @@ function capitalize(str) {
     return str.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Pull remote backup once on open; newest copy wins before any view renders.
+    if (window.GistSync?.isConnected()) {
+        try { await GistSync.reconcileOnOpen(); }
+        catch (e) { console.warn('[gist] reconcile skipped:', e.message); }
+    }
+    // Views unwired from the UI (kept in code, unavailable to users).
+    const DISABLED_VIEWS = ['time-tracking'];
     const saved = sessionStorage.getItem('activeView');
-    loadView(saved || 'home');
+    loadView(saved && !DISABLED_VIEWS.includes(saved) ? saved : 'home');
 });

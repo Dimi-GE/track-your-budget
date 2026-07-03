@@ -1,3 +1,16 @@
+## v0.0.2b.0 — July 2026
+
+- `feature` Settings — GitHub Gist Sync: connect a personal access token (gist scope) and a Gist ID to back up dashboard data to a remote JSON file; the token is stored only in this browser's localStorage
+- `feature` Settings — Connect/Disconnect toggle verifies the token and Gist against GitHub before saving; on connect the fields lock and a status line confirms the link, on disconnect the token is cleared from both the field and localStorage
+- `feature` Remote backup — smart connect establishes a baseline on first link: seeds an empty Gist with local data, adopts the remote copy when it is newer, or pushes local when it is newer; ties and un-comparable timestamps keep local (least destructive)
+- `feature` Remote backup — dashboard Apply pushes committed data to the Gist, and the app pulls once on open and adopts the remote copy when newer (newest-wins via `_meta.date`)
+- `feature` Remote backup — synced JSON mirrors the dashboard export structure (`entries` plus a `_meta.date`) so the Gist file stays interchangeable with manual file backups
+- `feature` Dashboard — Savings expense category: a withdrawal from the reserve, available only when Type is Expenses; it nets down the Savings balance instead of counting as an expense and leaves Flow untouched
+- `improvement` Savings withdrawals excluded from all expense analytics — Expenses by Category chart, Home expense breakdown and spending trend, and Behavior Analytics trends, spending heatmap, and forecast — keeping those focused on income-funded spending
+- `improvement` Savings totals now net of withdrawals across the Overview Savings card and Home Total Saved; `isSavingsWithdrawal()` helper added to app.js so the rule is defined once and applied consistently
+- `fix` Dashboard export — global and period exports now write only `entries` (the source of truth); derived totals were removed from the file since import recalculates them, so hand-editing a top-level total no longer silently has no effect
+- `parked` Hours Reports (time-tracking) unwired from the UI — hidden from sidebar navigation and blocked from session restore via a disabled-views guard; the view code is retained pending migration to a standalone project
+
 ## v0.0.1b — June 2026
 
 - `fix` Loading — per-view spinner replaces the former full-screen overlay; spinner appears inside the content area on first visit to each view and lifts only when the view signals it is fully rendered, preventing content flash across all views

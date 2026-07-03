@@ -15,10 +15,17 @@ The entry form is where all financial data originates. Every record in the app s
 - **Category** — changes depending on type:
   - *Income:* Starting Funds, Salary, Other
   - *Savings:* Flow, Other
-  - *Expenses:* Groceries, Deliveries, Pets, Medical, Media, Subscriptions, Rent, Online, Shopping, Gifts, Transport, Personal
+  - *Expenses:* Groceries, Deliveries, Pets, Medical, Media, Subscriptions, Rent, Online, Shopping, Gifts, Transport, Personal, Savings
 - **Note** — optional free-text field, visible in the transaction list.
 
 **Starting Funds** is a special income category. It can only be added once and represents the opening balance before any income or expenses are tracked. Once set, it disappears from the category list.
+
+**Savings** is a special *expense* category representing a **withdrawal from the reserve** — money taken out of savings in a critical situation (think of it as pulling cash off a savings/credit card). It is not consumption of income, so it behaves differently from every other expense category:
+- It **reduces the Savings total** (net reserve balance = deposits − withdrawals) rather than adding to Total Expenses.
+- It **does not affect Flow**, since the money comes from the reserve, not from income cash flow.
+- It is **excluded from all expense analytics** — the Expenses by Category chart, the Home expense breakdown and spending trend, and the Behavior Analytics trends/heatmap/forecast — which stay focused on income-funded spending.
+
+It still appears in the transaction list (as an outflow) so the withdrawal is on record.
 
 **Backup (file operations)** — accessible via the file icon button, this panel slides open with three controls: a filename field, Export, and Import. Export saves the entire dataset as a `.json` file. Import replaces the current dataset with a file. Both operate on the full history, not a specific period.
 
@@ -37,7 +44,7 @@ Each staged entry shows date, amount, type, and category. Individual entries can
 Four cards showing cumulative totals across the entire committed dataset (no period filter — these are all-time sums):
 
 - **Income** — total of all income entries, including Starting Funds.
-- **Savings** — total of all savings entries across all categories.
+- **Savings** — net reserve balance: total of all savings entries minus any *Savings* withdrawals (Expenses type, Savings category).
 - **Total Expenses** — sum of all expense entries across all categories.
 - **Flow** — the net result: `Income − Savings (Flow type only) − Expenses`. This is what you actually have available after obligations are met. The Flow card is visually highlighted as it's the single most important number on the dashboard.
 

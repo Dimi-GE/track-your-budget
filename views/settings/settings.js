@@ -79,5 +79,77 @@ function initSettings() {
     }
 
     showResetButton();
+
+    // ── Gist remote backup ─────────────────────────────────────────────────
+    const tokenInput  = document.getElementById('gist-token');
+    const idInput     = document.getElementById('gist-id');
+    const gistAction  = document.getElementById('gist-action');
+    const gistStatus  = document.getElementById('gist-status');
+
+    function setStatus(msg, kind) {
+        gistStatus.textContent = msg;
+        gistStatus.className = 'gist-status' + (kind ? ' ' + kind : '');
+    }
+
+    function renderConnected() {
+        const { token, gistId } = GistSync.getConfig();
+        tokenInput.value = token;
+        idInput.value    = gistId;
+        tokenInput.disabled = true;
+        idInput.disabled    = true;
+        gistAction.innerHTML = '<button class="btn-gist-disconnect" id="btn-gist-disconnect">Disconnect</button>';
+        gistAction.querySelector('#btn-gist-disconnect').addEventListener('click', doDisconnect);
+        setStatus('Connected — dashboard changes back up to this Gist.', 'connected');
+    }
+
+    function renderDisconnected() {
+        tokenInput.disabled = false;
+        idInput.disabled    = false;
+        gistAction.innerHTML = '<button class="btn-backup" id="btn-gist-connect">Connect</button>';
+        gistAction.querySelector('#btn-gist-connect').addEventListener('click', doConnect);
+    }
+
+    async function doConnect() {
+        const token  = tokenInput.value.trim();
+        const gistId = idInput.value.trim();
+        const btn = gistAction.querySelector('#btn-gist-connect');
+        btn.disabled = true;
+        setStatus('Verifying…', '');
+        const result = await GistSync.validate(token, gistId);
+        if (!result.ok) {
+            setStatus(result.error, 'error');
+            btn.disabled = false;
+            return;
+        }
+        GistSync.saveConfig(token, gistId);
+        renderConnected();
+        // Establish a baseline immediately (seed / pull / push as appropriate).
+        try {
+            const { action } = await GistSync.establishConnection();
+            setStatus(CONNECT_MESSAGES[action] || CONNECT_MESSAGES.none, 'connected');
+        } catch (e) {
+            console.warn('[gist] establish on connect failed:', e.message);
+            setStatus('Connected, but the initial sync failed — check the console. Changes will retry on Apply.', 'error');
+        }
+    }
+
+    const CONNECT_MESSAGES = {
+        seeded: 'Connected — your local data was uploaded to this Gist.',
+        pulled: 'Connected — pulled newer data from this Gist. Reopen the Dashboard to see it.',
+        pushed: 'Connected — your local data is now backed up to this Gist.',
+        none:   'Connected — no data yet; changes will back up on Apply.',
+    };
+
+    function doDisconnect() {
+        GistSync.clearConfig();
+        tokenInput.value = '';
+        idInput.value    = '';
+        renderDisconnected();
+        setStatus('', '');
+    }
+
+    if (GistSync.isConnected()) renderConnected();
+    else renderDisconnected();
+
     window.viewReady?.();
 }

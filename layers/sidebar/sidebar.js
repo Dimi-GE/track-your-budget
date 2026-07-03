@@ -3,7 +3,9 @@ const NAV_ITEMS = [
     { icon: 'ti-layout-dashboard',  label: 'Dashboard',     view: 'dashboard' },
     { icon: 'ti-receipt',           label: 'Transactions',  view: null, hidden: true },
     { icon: 'ti-chart-bar',         label: 'Analytics',     view: 'behavior-analytics' },
-    { icon: 'ti-clock-hour-4',      label: 'Hours Reports', view: 'time-tracking' },
+    // Hours Reports (time-tracking) is unwired from the UI — migrated to a
+    // standalone project. Code is kept; hidden hides it from the nav.
+    { icon: 'ti-clock-hour-4',      label: 'Hours Reports', view: 'time-tracking', hidden: true },
     { icon: 'ti-map-2',             label: 'Roadmap',       view: 'roadmap' },
     { icon: 'ti-settings',          label: 'Settings',      view: 'settings' },
 ];

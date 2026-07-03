@@ -9,7 +9,8 @@ function initDashboard() {
         expenses: [
             'Groceries', 'Deliveries', 'Pets', 'Medical',
             'Media', 'Subscriptions', 'Rent', 'Online',
-            'Shopping', 'Gifts', 'Transport', 'Personal'
+            'Shopping', 'Gifts', 'Transport', 'Personal',
+            'Savings'   // withdrawal from the reserve (nets down Savings, not an expense)
         ],
     };
 
@@ -160,8 +161,18 @@ function initDashboard() {
         renderTxList(committed.entries);
         renderExpensesChart(committed.entries);
         saveToStorage();
+        pushToGist();
     }
     window.applyPeriodImport = applyCommitted;
+
+    // --- Remote backup (push on commit if connected) ---
+    function pushToGist() {
+        if (!window.GistSync?.isConnected()) return;
+        const date = GistSync.markLocalModified();
+        GistSync.push(committed, date)
+            .then(() => console.log('[gist] pushed at', date))
+            .catch(e => console.warn('[gist] push failed:', e.message));
+    }
 
     // --- Cards ---
     function updateCards() {
@@ -174,7 +185,10 @@ function initDashboard() {
     // --- Export ---
     btnExport.addEventListener('click', () => {
         const filename = (inputFilename.value.trim() || 'dashboard-backup') + '.json';
-        const blob = new Blob([JSON.stringify(committed, null, 2)], { type: 'application/json' });
+        // Export only `entries` — the source of truth. Totals are derived on
+        // import via recalculateTotals(), so writing them here would be
+        // misleading (hand-editing them has no effect).
+        const blob = new Blob([JSON.stringify({ entries: committed.entries }, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url; a.download = filename; a.click();

@@ -26,9 +26,12 @@ function initHome() {
         if (raw) entries = JSON.parse(raw).entries || [];
     } catch (e) {}
 
-    // --- All-time total saved ---
+    // --- All-time total saved (deposits minus reserve withdrawals) ---
     let totalSaved = 0;
-    entries.forEach(e => { if (e.type === 'savings') totalSaved += e.amount; });
+    entries.forEach(e => {
+        if (e.type === 'savings') totalSaved += e.amount;
+        else if (isSavingsWithdrawal(e)) totalSaved -= e.amount;
+    });
 
     // --- Resolve reference month ---
     // Use the current month if it has income; otherwise fall back to the most
@@ -46,6 +49,8 @@ function initHome() {
         me.forEach(e => {
             if (e.type === 'income') {
                 income += e.amount;
+            } else if (isSavingsWithdrawal(e)) {
+                savings -= e.amount;              // reserve drawdown, not an expense
             } else if (e.type === 'expenses') {
                 expenses += e.amount;
                 if (e.category === 'rent') rent += e.amount;
@@ -171,7 +176,7 @@ function renderHomeTrend(entries) {
         months.push({ key, label: d.toLocaleDateString('en-US', { month: 'short' }), expenses: 0 });
     }
     entries.forEach(e => {
-        if (e.type !== 'expenses' || !e.date) return;
+        if (e.type !== 'expenses' || isSavingsWithdrawal(e) || !e.date) return;
         const m = months.find(m => m.key === e.date.slice(0, 7));
         if (m) m.expenses += e.amount;
     });
@@ -221,7 +226,7 @@ function renderHomeDonut(monthEntries, EXPENSE_CATS) {
     if (!canvas) return null;
 
     const totals = {};
-    monthEntries.filter(e => e.type === 'expenses').forEach(e => {
+    monthEntries.filter(e => e.type === 'expenses' && !isSavingsWithdrawal(e)).forEach(e => {
         totals[e.category] = (totals[e.category] || 0) + e.amount;
     });
 

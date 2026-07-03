@@ -30,4 +30,30 @@
             </div>
         </div>
     </div>
+
+    <div class="settings-section">
+        <div class="section-title">Remote Backup</div>
+        <div class="settings-card gist-card">
+            <div class="settings-card-body">
+                <div class="settings-item-label">GitHub Gist Sync</div>
+                <div class="settings-item-desc">Connect a GitHub personal access token (with <strong>gist</strong> scope) and a Gist ID to back up dashboard data to a remote JSON file. The token is stored only in this browser.</div>
+
+                <div class="gist-fields">
+                    <label class="gist-field">
+                        <span class="gist-field-label">Access token</span>
+                        <input type="password" id="gist-token" class="gist-input" placeholder="ghp_… or github_pat_…" autocomplete="off" spellcheck="false">
+                    </label>
+                    <label class="gist-field">
+                        <span class="gist-field-label">Gist ID</span>
+                        <input type="text" id="gist-id" class="gist-input" placeholder="e.g. 1a2b3c4d5e6f…" autocomplete="off" spellcheck="false">
+                    </label>
+                </div>
+
+                <div class="gist-status" id="gist-status"></div>
+            </div>
+            <div class="settings-item-action" id="gist-action">
+                <button class="btn-backup" id="btn-gist-connect">Connect</button>
+            </div>
+        </div>
+    </div>
 </div>

@@ -66,7 +66,8 @@ function initExpensesChart() {
     btnExportPeriod.addEventListener('click', () => {
         const period       = getSelectedPeriod();
         const periodEntries = filterEntriesByPeriod(currentEntries, period);
-        const data         = { ...recalculateTotals(periodEntries), period };
+        // Only `entries` are exported — totals are derived on import.
+        const data         = { entries: periodEntries, period };
         const filename     = (periodInputFilename.value.trim() || `dashboard-${period.start}_to_${period.end}`) + '.json';
 
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
