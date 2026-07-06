@@ -21,15 +21,19 @@ This prevents the cards from showing zeros at the start of a new month when the 
 
 ---
 
-## Spending Trend
+## Savings Holdings
 
-A mini line chart showing total expenses for each of the last 6 calendar months, including the current month. The x-axis shows abbreviated month names; the y-axis scales to the data range. The chart is directional — it shows whether spending is climbing, falling, or flat over the recent period, not absolute detail.
+A sheet summarising where savings sit, grouped by currency and holding type. Columns are **Amount | Currency | Type**, one row per unique `(currency, holding type)` combination found across all savings entries.
+
+Amounts are gross savings deposits — the sum of every *Savings*-type entry in that group. This is a visual representation only: there is no currency conversion, and reserve withdrawals (the *Savings* expense category) are **not** netted out in this phase. Rows are sorted by currency, then by amount descending. If no savings have been recorded, the panel shows a no-data state.
+
+The currency shown on each entry comes from the Dashboard entry form; the regional currency is applied by default, with foreign currencies possible on *Savings → Other* entries. Holding types (Cash, Card, Bank, Other) are also set on the Dashboard when the entry type is Savings.
 
 ---
 
 ## Recent Transactions
 
-The 5 most recent committed entries across all types, sorted newest first. Each row shows the date, category (colour-coded to match the Dashboard palette), and the amount with a sign prefix (`+` for income, `~` for savings, `−` for expenses).
+The 5 most recent committed entries across all types, sorted newest first. Because entries are day-level only, entries sharing a date are ordered by commit order (most recently committed first). Each row shows the date, the category label in plain white text, and the amount with a sign prefix (`+` for income, `~` for savings, `−` for expenses). The amount is colour-coded by direction: green for money in (income and savings), red for expenses.
 
 This is a read-only snapshot. The full transaction list with filters is in the Dashboard.
 

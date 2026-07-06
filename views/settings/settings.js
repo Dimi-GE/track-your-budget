@@ -1,5 +1,5 @@
 function initSettings() {
-    const STORAGE_KEYS = ['dashboard_committed', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
+    const STORAGE_KEYS = ['dashboard_committed', 'currency_config', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
 
     // ── Backup ─────────────────────────────────────────────────────────────
     document.getElementById('btn-backup').addEventListener('click', () => {
@@ -150,6 +150,87 @@ function initSettings() {
 
     if (GistSync.isConnected()) renderConnected();
     else renderDisconnected();
+
+    // ── Currencies ─────────────────────────────────────────────────────────
+    const curListEl = document.getElementById('currency-list');
+    const curCode   = document.getElementById('cur-code');
+    const curSymbol = document.getElementById('cur-symbol');
+    const curName   = document.getElementById('cur-name');
+    const curMsgEl  = document.getElementById('currency-msg');
+
+    function setCurMsg(msg, kind) {
+        curMsgEl.textContent = msg || '';
+        curMsgEl.className = 'currency-msg' + (kind ? ' ' + kind : '');
+    }
+
+    // Persist and propagate: back up to the Gist bundle too, so the currency
+    // list follows the user across devices even without a Dashboard commit.
+    function persistCurrency(cfg) {
+        saveCurrencyConfig(cfg);
+        if (window.GistSync?.isConnected()) {
+            GistSync.pushLocal().catch(e => console.warn('[gist] currency push failed:', e.message));
+        }
+    }
+
+    function renderCurrencies() {
+        const cfg = getCurrencyConfig();
+        curListEl.innerHTML = cfg.list.map(c => {
+            const isRegional = c.code === cfg.regional;
+            return `
+                <div class="currency-row${isRegional ? ' currency-row--regional' : ''}">
+                    <button class="currency-star" data-code="${c.code}" title="${isRegional ? 'Regional currency' : 'Set as regional'}">
+                        <i class="ti ${isRegional ? 'ti-star-filled' : 'ti-star'}"></i>
+                    </button>
+                    <span class="currency-code">${c.code}</span>
+                    <span class="currency-sym">${c.symbol || ''}</span>
+                    <span class="currency-name">${c.name || ''}</span>
+                    <button class="currency-remove" data-code="${c.code}" title="Remove"${isRegional || cfg.list.length <= 1 ? ' disabled' : ''}>
+                        <i class="ti ti-x"></i>
+                    </button>
+                </div>`;
+        }).join('');
+
+        curListEl.querySelectorAll('.currency-star').forEach(btn =>
+            btn.addEventListener('click', () => setRegional(btn.dataset.code)));
+        curListEl.querySelectorAll('.currency-remove').forEach(btn =>
+            btn.addEventListener('click', () => removeCurrency(btn.dataset.code)));
+    }
+
+    function addCurrency() {
+        const code = curCode.value.trim().toUpperCase();
+        const symbol = curSymbol.value.trim();
+        const name = curName.value.trim();
+        if (!code) { setCurMsg('Enter a currency code.', 'error'); return; }
+        const cfg = getCurrencyConfig();
+        if (cfg.list.some(c => c.code === code)) { setCurMsg(`${code} already exists.`, 'error'); return; }
+        cfg.list.push({ code, symbol, name });
+        persistCurrency(cfg);
+        curCode.value = curSymbol.value = curName.value = '';
+        setCurMsg(`Added ${code}.`, 'ok');
+        renderCurrencies();
+    }
+
+    function removeCurrency(code) {
+        const cfg = getCurrencyConfig();
+        if (cfg.list.length <= 1 || code === cfg.regional) return;
+        cfg.list = cfg.list.filter(c => c.code !== code);
+        persistCurrency(cfg);
+        setCurMsg(`Removed ${code}.`, 'ok');
+        renderCurrencies();
+    }
+
+    function setRegional(code) {
+        const cfg = getCurrencyConfig();
+        if (cfg.regional === code) return;
+        cfg.regional = code;
+        persistCurrency(cfg);
+        setCurMsg(`${code} is now the regional currency.`, 'ok');
+        renderCurrencies();
+    }
+
+    document.getElementById('btn-cur-add').addEventListener('click', addCurrency);
+    curName.addEventListener('keydown', e => { if (e.key === 'Enter') addCurrency(); });
+    renderCurrencies();
 
     window.viewReady?.();
 }

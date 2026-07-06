@@ -1,4 +1,3 @@
-let homeTrendChart = null;
 let homeDonutChart = null;
 
 function initHome() {
@@ -107,17 +106,23 @@ function initHome() {
 
     // --- Recent Transactions ---
     const txList = document.getElementById('home-tx-list');
-    const recent = [...entries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+    // Newest first. Entries are day-level only, so ties on date fall back to
+    // insertion order reversed (the most recently committed entry wins), which
+    // is what "most recent" means when several share a date.
+    const recent = entries
+        .map((e, i) => [e, i])
+        .sort((a, b) => b[0].date.localeCompare(a[0].date) || b[1] - a[1])
+        .slice(0, 5)
+        .map(([e]) => e);
 
     if (recent.length === 0) {
         txList.innerHTML = '<div class="home-no-data">No transactions yet</div>';
     } else {
         txList.innerHTML = recent.map(e => {
-            const sign  = e.type === 'income' ? '+' : e.type === 'savings' ? '~' : '-';
-            const color = getCategoryColor(e.category);
+            const sign = e.type === 'income' ? '+' : e.type === 'savings' ? '~' : '-';
             return `<div class="home-tx-item">
                 <span class="home-tx-date">${e.date}</span>
-                <span class="home-tx-cat" style="color:${color};">${e.categoryLabel}</span>
+                <span class="home-tx-cat">${e.categoryLabel}</span>
                 <span class="home-tx-amount home-tx-amount--${e.type}">${sign}${e.amount.toFixed(2)}</span>
             </div>`;
         }).join('');
@@ -152,73 +157,66 @@ function initHome() {
     setBar('home-expense-ratio-fill', 'home-expense-ratio-val', monthIncome > 0 ? monthExpenses / monthIncome : 0, 0.80, false);
     setBar('home-rent-burden-fill',   'home-rent-burden-val',   monthIncome > 0 ? monthRent / monthIncome     : 0, 0.30, false);
 
+    // --- Savings Holdings sheet ---
+    // Gross savings deposits grouped by currency + holding type (visual only,
+    // no conversion). Withdrawals (reserve drawdowns) are not netted here.
+    renderHomeHoldings(entries);
+
     // --- Charts ---
-    if (homeTrendChart) { homeTrendChart.destroy(); homeTrendChart = null; }
     if (homeDonutChart) { homeDonutChart.destroy(); homeDonutChart = null; }
 
     loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js')
         .then(() => {
-            homeTrendChart = renderHomeTrend(entries);
             homeDonutChart = renderHomeDonut(monthEntries, EXPENSE_CATS);
             window.viewReady?.();
         });
 }
 
-function renderHomeTrend(entries) {
-    const canvas = document.getElementById('home-trend-chart');
-    if (!canvas) return null;
+function renderHomeHoldings(entries) {
+    const el = document.getElementById('home-holdings');
+    if (!el) return;
 
-    const now = new Date();
-    const months = [];
-    for (let i = 5; i >= 0; i--) {
-        const d   = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-        months.push({ key, label: d.toLocaleDateString('en-US', { month: 'short' }), expenses: 0 });
-    }
+    const regional = getRegionalCurrency();
+    const groups = {};
     entries.forEach(e => {
-        if (e.type !== 'expenses' || isSavingsWithdrawal(e) || !e.date) return;
-        const m = months.find(m => m.key === e.date.slice(0, 7));
-        if (m) m.expenses += e.amount;
+        if (e.type !== 'savings') return;
+        const currency = e.currency || regional;
+        const holding  = e.holding || 'other';
+        const key = `${currency}|${holding}`;
+        if (!groups[key]) groups[key] = { currency, holding, amount: 0 };
+        groups[key].amount += e.amount;
     });
 
-    return new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: months.map(m => m.label),
-            datasets: [{
-                data: months.map(m => m.expenses),
-                borderColor: '#e05c5c',
-                backgroundColor: 'rgba(224, 92, 92, 0.08)',
-                borderWidth: 2,
-                pointRadius: 3,
-                pointBackgroundColor: '#e05c5c',
-                fill: true,
-                tension: 0.35,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: { label: item => ` ${item.parsed.y.toFixed(2)}` }
-                }
-            },
-            scales: {
-                x: {
-                    ticks:  { color: '#888', font: { size: 11 } },
-                    grid:   { color: '#1e1e2e' },
-                    border: { color: '#1e1e2e' },
-                },
-                y: {
-                    ticks:  { color: '#888', font: { size: 11 }, callback: v => v.toFixed(0) },
-                    grid:   { color: '#1e1e2e' },
-                    border: { color: '#1e1e2e' },
-                }
-            }
-        }
-    });
+    const rows = Object.values(groups).sort((a, b) =>
+        a.currency.localeCompare(b.currency) || b.amount - a.amount
+    );
+
+    if (rows.length === 0) {
+        el.innerHTML = '<div class="home-no-data">No savings recorded yet</div>';
+        return;
+    }
+
+    el.innerHTML = `
+        <table class="holdings-table">
+            <thead>
+                <tr>
+                    <th class="holdings-amount">Amount</th>
+                    <th>Currency</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows.map(r => {
+                    const meta = getCurrencyMeta(r.currency);
+                    const sym  = meta.symbol ? `${meta.symbol} ` : '';
+                    return `<tr>
+                        <td class="holdings-amount">${sym}${r.amount.toFixed(2)}</td>
+                        <td><span class="holdings-currency">${r.currency}</span></td>
+                        <td class="holdings-type">${getHoldingLabel(r.holding)}</td>
+                    </tr>`;
+                }).join('')}
+            </tbody>
+        </table>`;
 }
 
 function renderHomeDonut(monthEntries, EXPENSE_CATS) {

@@ -1,4 +1,4 @@
-## v0.0.2b.0 — July 2026
+## v0.0.2b — July 2026
 
 - `feature` Settings — GitHub Gist Sync: connect a personal access token (gist scope) and a Gist ID to back up dashboard data to a remote JSON file; the token is stored only in this browser's localStorage
 - `feature` Settings — Connect/Disconnect toggle verifies the token and Gist against GitHub before saving; on connect the fields lock and a status line confirms the link, on disconnect the token is cleared from both the field and localStorage

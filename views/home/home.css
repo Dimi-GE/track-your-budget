@@ -168,7 +168,7 @@
 }
 
 .home-tx-cat {
-    color: var(--text-muted);
+    color: var(--text-primary);
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -181,8 +181,59 @@
 }
 
 .home-tx-amount--income   { color: #4caf7d; }
+.home-tx-amount--savings  { color: #4caf7d; }
 .home-tx-amount--expenses { color: #e05c5c; }
-.home-tx-amount--savings  { color: #4fc3f7; }
+
+/* Savings holdings sheet */
+.holdings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.holdings-table th {
+    text-align: left;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    font-weight: 500;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+.holdings-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+}
+
+.holdings-table tr:last-child td {
+    border-bottom: none;
+}
+
+.holdings-amount {
+    text-align: left;
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    white-space: nowrap;
+    padding-right: 16px;
+    font-weight: 600;
+}
+
+.holdings-currency {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    padding: 2px 6px;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    color: var(--accent);
+}
+
+.holdings-type {
+    color: var(--text-muted);
+}
 
 /* Donut chart */
 .home-donut-wrap {

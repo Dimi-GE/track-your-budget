@@ -24,6 +24,8 @@ function initDashboard() {
     // --- Elements ---
     const selectType    = document.getElementById('select-type');
     const selectCategory= document.getElementById('select-category');
+    const selectCurrency= document.getElementById('select-currency');
+    const selectHolding = document.getElementById('select-holding');
     const inputDate     = document.getElementById('input-date');
     const inputAmount   = document.getElementById('input-amount');
     const btnAdd        = document.getElementById('btn-add');
@@ -87,8 +89,50 @@ function initDashboard() {
         });
     }
 
-    selectType.addEventListener('change', populateCategories);
+    // --- Currency & holding ---
+    // Currency defaults to the regional currency and stays locked, except for a
+    // Savings → Other entry (money entering the reserve from outside the Flow),
+    // which may be in a foreign currency. Holding type only applies to Savings.
+    function populateCurrency() {
+        const cfg = getCurrencyConfig();
+        selectCurrency.innerHTML = '';
+        cfg.list.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.code;
+            opt.textContent = c.symbol ? `${c.code} ${c.symbol}` : c.code;
+            selectCurrency.appendChild(opt);
+        });
+        selectHolding.innerHTML = '';
+        HOLDING_TYPES.forEach(h => {
+            const opt = document.createElement('option');
+            opt.value = h.key;
+            opt.textContent = h.label;
+            selectHolding.appendChild(opt);
+        });
+    }
+
+    function updateCurrencyHoldingState() {
+        const type     = selectType.value;
+        const category = selectCategory.value;
+        const regional = getRegionalCurrency();
+        const foreignAllowed = type === 'savings' && category === 'other';
+
+        selectHolding.style.display = type === 'savings' ? '' : 'none';
+
+        if (foreignAllowed) {
+            selectCurrency.disabled = false;
+        } else {
+            selectCurrency.value = regional;
+            selectCurrency.disabled = true;
+        }
+    }
+
+    populateCurrency();
+
+    selectType.addEventListener('change', () => { populateCategories(); updateCurrencyHoldingState(); });
+    selectCategory.addEventListener('change', updateCurrencyHoldingState);
     populateCategories();
+    updateCurrencyHoldingState();
 
     // --- Staged entries ---
     function renderHistory() {
@@ -108,6 +152,8 @@ function initDashboard() {
                         <span class="entry-amount">${entry.amount.toFixed(2)}</span>
                         <span class="entry-type">${capitalize(entry.type)}</span>
                         <span class="entry-category">${entry.categoryLabel}</span>
+                        <span class="entry-currency">${entry.currency || getRegionalCurrency()}</span>
+                        ${entry.holding ? `<span class="entry-holding">${getHoldingLabel(entry.holding)}</span>` : ''}
                     </div>
                     ${entry.note ? `<div class="entry-note">${entry.note}</div>` : ''}
                 </div>
@@ -139,7 +185,13 @@ function initDashboard() {
         const date          = inputDate.value;
         if (category === 'starting_funds') { startingFundsLocked = true; populateCategories(); }
         const note = inputNote.value.trim();
-        staged.push({ date, amount, type, category, categoryLabel, ...(note && { note }) });
+        const currency = selectCurrency.disabled ? getRegionalCurrency() : selectCurrency.value;
+        const holding  = type === 'savings' ? selectHolding.value : undefined;
+        staged.push({
+            date, amount, type, category, categoryLabel, currency,
+            ...(holding && { holding }),
+            ...(note && { note }),
+        });
         renderHistory();
         inputAmount.value = '';
         inputNote.value   = '';
@@ -169,7 +221,7 @@ function initDashboard() {
     function pushToGist() {
         if (!window.GistSync?.isConnected()) return;
         const date = GistSync.markLocalModified();
-        GistSync.push(committed, date)
+        GistSync.push({ committed, currency: getCurrencyConfig() }, date)
             .then(() => console.log('[gist] pushed at', date))
             .catch(e => console.warn('[gist] push failed:', e.message));
     }

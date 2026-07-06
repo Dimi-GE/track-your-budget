@@ -32,6 +32,26 @@
     </div>
 
     <div class="settings-section">
+        <div class="section-title">Currencies</div>
+        <div class="settings-card currency-card">
+            <div class="settings-card-body">
+                <div class="settings-item-label">Currencies &amp; Regional</div>
+                <div class="settings-item-desc">Manage the currencies available on the Dashboard. The <strong>regional</strong> currency is the default applied to every transaction (a foreign currency can only be chosen for Savings &rarr; Other). Marked with a star.</div>
+
+                <div class="currency-list" id="currency-list"></div>
+
+                <div class="currency-add">
+                    <input type="text" id="cur-code" class="currency-input" placeholder="Code (EUR)" maxlength="6" autocomplete="off" spellcheck="false">
+                    <input type="text" id="cur-symbol" class="currency-input currency-input--sym" placeholder="€" maxlength="4" autocomplete="off" spellcheck="false">
+                    <input type="text" id="cur-name" class="currency-input currency-input--name" placeholder="Name (Euro)" maxlength="40" autocomplete="off" spellcheck="false">
+                    <button class="btn-backup" id="btn-cur-add">Add</button>
+                </div>
+                <div class="currency-msg" id="currency-msg"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
         <div class="section-title">Remote Backup</div>
         <div class="settings-card gist-card">
             <div class="settings-card-body">

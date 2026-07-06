@@ -14,6 +14,7 @@ const GistSync = (() => {
     const KEY_ID     = 'gist_id';
     const KEY_MTIME  = 'gist_local_mtime';
     const DATA_KEY   = 'dashboard_committed';
+    const CURRENCY_KEY = 'currency_config';
     const FILENAME   = 'dashboard.json';
     const API        = 'https://api.github.com/gists/';
 
@@ -93,8 +94,10 @@ const GistSync = (() => {
     }
 
     // ── Pull remote data ─────────────────────────────────────────────────
-    // Resolves { data, date } where data is the committed structure and date
-    // is its _meta.date, or null if the remote has no usable data.
+    // Resolves { data, date } where data is a bundle { committed, currency }
+    // and date is its _meta.date, or null if the remote has no usable data.
+    // Back-compat: gists written before the bundle stored the committed object
+    // at the top level (its hallmark is a top-level `entries` array).
     async function pull() {
         const { token, gistId } = getConfig();
         if (!token || !gistId) return null;
@@ -102,16 +105,24 @@ const GistSync = (() => {
         if (!res.ok) throw new Error(`Pull failed (${res.status})`);
         const parsed = await readFile(await res.json());
         if (!parsed) return null;
-        const { _meta, ...data } = parsed;
-        return { data, date: (_meta && _meta.date) || '' };
+        const { _meta, ...rest } = parsed;
+        const date = (_meta && _meta.date) || '';
+        const bundle = ('committed' in rest)
+            ? { committed: rest.committed || null, currency: rest.currency_config || null }
+            : { committed: rest, currency: null };          // legacy shape
+        return { data: bundle, date };
     }
 
     // ── Push local data ──────────────────────────────────────────────────
-    // `committed` is the dashboard structure; `date` is its local mtime.
-    async function push(committed, date) {
+    // `bundle` is { committed, currency }; `date` is its local mtime. The
+    // currency config is only written when present, so an absent one never
+    // clobbers a remote copy with null.
+    async function push(bundle, date) {
         const { token, gistId } = getConfig();
         if (!token || !gistId) return;
-        const content = JSON.stringify({ ...committed, _meta: { date } }, null, 2);
+        const payload = { committed: bundle.committed, _meta: { date } };
+        if (bundle.currency) payload.currency_config = bundle.currency;
+        const content = JSON.stringify(payload, null, 2);
         const res = await request(gistId, token, {
             method: 'PATCH',
             body: JSON.stringify({ files: { [FILENAME]: { content } } }),
@@ -120,14 +131,35 @@ const GistSync = (() => {
     }
 
     // ── Local dataset helpers ────────────────────────────────────────────
+    // A bundle bundles everything that should travel together across devices:
+    // the committed dashboard data plus the currency configuration.
+    function getLocalBundle() {
+        let committed = null, currency = null;
+        try { committed = JSON.parse(localStorage.getItem(DATA_KEY)); } catch {}
+        try { currency  = JSON.parse(localStorage.getItem(CURRENCY_KEY)); } catch {}
+        return { committed, currency };
+    }
+
+    function applyRemoteBundle(bundle) {
+        if (bundle.committed) localStorage.setItem(DATA_KEY, JSON.stringify(bundle.committed));
+        if (bundle.currency)  localStorage.setItem(CURRENCY_KEY, JSON.stringify(bundle.currency));
+    }
+
     function getLocalData() {
-        try { return JSON.parse(localStorage.getItem(DATA_KEY)); }
-        catch { return null; }
+        return getLocalBundle().committed;
     }
 
     function hasLocalData() {
         const d = getLocalData();
         return Boolean(d && Array.isArray(d.entries) && d.entries.length > 0);
+    }
+
+    // Convenience: mark modified and push the current local bundle. Used by
+    // Settings when currency config changes outside a Dashboard commit.
+    async function pushLocal() {
+        if (!isConnected()) return;
+        const date = markLocalModified();
+        await push(getLocalBundle(), date);
     }
 
     // ── Establish the link (smart connect) ───────────────────────────────
@@ -148,7 +180,7 @@ const GistSync = (() => {
         if (!remote) {
             if (!local) return { action: 'none' };
             const date = localMtime || markLocalModified();
-            await push(getLocalData(), date);
+            await push(getLocalBundle(), date);
             return { action: 'seeded' };
         }
 
@@ -158,12 +190,12 @@ const GistSync = (() => {
         else                                  remoteNewer = remote.date > localMtime;
 
         if (remoteNewer) {
-            localStorage.setItem(DATA_KEY, JSON.stringify(remote.data));
+            applyRemoteBundle(remote.data);
             localStorage.setItem(KEY_MTIME, remote.date || new Date().toISOString());
             return { action: 'pulled' };
         }
         const date = localMtime || markLocalModified();
-        await push(getLocalData(), date);
+        await push(getLocalBundle(), date);
         return { action: 'pushed' };
     }
 
@@ -182,7 +214,7 @@ const GistSync = (() => {
         const remoteNewer = !localMtime || (remote.date && remote.date > localMtime);
         if (!remoteNewer) return false;
 
-        localStorage.setItem(DATA_KEY, JSON.stringify(remote.data));
+        applyRemoteBundle(remote.data);
         localStorage.setItem(KEY_MTIME, remote.date || new Date().toISOString());
         console.log('[gist] adopted remote data from', remote.date);
         return true;
@@ -191,8 +223,8 @@ const GistSync = (() => {
     return {
         FILENAME,
         getConfig, isConnected, saveConfig, clearConfig,
-        markLocalModified, getLocalMtime, getLocalData, hasLocalData,
-        validate, pull, push, establishConnection, reconcileOnOpen,
+        markLocalModified, getLocalMtime, getLocalData, getLocalBundle, hasLocalData,
+        validate, pull, push, pushLocal, establishConnection, reconcileOnOpen,
     };
 })();
 

@@ -6,6 +6,20 @@ Additional settings: GitHub Gist Sync, currency symbol.
 ### Onboarding
 Guided introduction to the app covering the data entry workflow, what Flow means, and how the analytics build on committed data.
 
+## In Progress
+
+### Multi-currency Support (Visual)
+Phase 1 — display only, no conversion or cross-currency math.
+- Per-transaction currency field on the Dashboard entry form, defaulting to
+  the regional currency and unlocked only for Savings → Other.
+- Holding type (Cash, Card, Bank, Other) captured on Savings entries.
+- Settings: manage the currency list and set the regional currency.
+- Home: savings holdings sheet (Amount | Currency | Type) replacing the
+  spending trend panel, grouped by currency and holding type.
+- Currency config synced through both local JSON backup and the Gist bundle.
+
+Base-currency conversion and calculations remain in the Backlog.
+
 ## Backlog
 
 ### HackMD Integration
@@ -14,8 +28,10 @@ Pull document content from the HackMD API. Edit docs collaboratively online, see
 ### PDF: Financial Report Export
 One-click budget report covering a selected period: income, expenses, savings breakdown, and a forecast snapshot.
 
-### Multi-currency Support
-Track income and expenses in different currencies with a configurable base currency for display.
+### Multi-currency Support (Calculations)
+Base-currency conversion with configurable rates, so mixed-currency totals
+(Savings, Flow, analytics) resolve to a single display currency. Builds on the
+visual currency support now In Progress.
 
 ### Profiles
 Option to split the dashboard into a seperate project, tracking X financial dashboards separately.

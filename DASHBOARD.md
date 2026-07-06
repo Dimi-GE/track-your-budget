@@ -16,6 +16,8 @@ The entry form is where all financial data originates. Every record in the app s
   - *Income:* Starting Funds, Salary, Other
   - *Savings:* Flow, Other
   - *Expenses:* Groceries, Deliveries, Pets, Medical, Media, Subscriptions, Rent, Online, Shopping, Gifts, Transport, Personal, Savings
+- **Currency** — sits between Category and Note. Defaults to the regional currency (set in Settings) and is **locked** for every entry, with one exception: a *Savings → Other* entry — money entering the reserve from outside the Flow — unlocks the selector so a foreign currency can be chosen. This is a visual attribute only in this phase; no conversion or cross-currency math is performed.
+- **Holding** — shown only when the type is *Savings*. Records where the money sits (Cash, Card, Bank, Other). Used to group the Home Savings Holdings sheet.
 - **Note** — optional free-text field, visible in the transaction list.
 
 **Starting Funds** is a special income category. It can only be added once and represents the opening balance before any income or expenses are tracked. Once set, it disappears from the category list.

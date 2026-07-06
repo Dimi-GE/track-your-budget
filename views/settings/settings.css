@@ -134,6 +134,114 @@
     border-color: var(--text-muted);
 }
 
+/* ── Currencies ──────────────────────────────────────────────────────── */
+.currency-card {
+    align-items: flex-start;
+}
+
+.currency-card .settings-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.currency-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 14px;
+    max-width: 420px;
+}
+
+.currency-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.currency-row--regional {
+    border-color: var(--accent);
+}
+
+.currency-star,
+.currency-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+.currency-star:hover { color: var(--accent); }
+.currency-row--regional .currency-star { color: var(--accent); }
+
+.currency-remove:hover:not(:disabled) { color: var(--negative); }
+.currency-remove:disabled { opacity: 0.3; cursor: default; }
+
+.currency-code {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    width: 48px;
+}
+
+.currency-sym {
+    color: var(--text-muted);
+    width: 24px;
+    text-align: center;
+}
+
+.currency-name {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.currency-add {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    max-width: 420px;
+    flex-wrap: wrap;
+}
+
+.currency-input {
+    background: var(--bg, #1a1a1a);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    padding: 8px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    width: 96px;
+    transition: border-color 0.15s;
+}
+
+.currency-input--sym  { width: 56px; }
+.currency-input--name { flex: 1; min-width: 120px; width: auto; }
+
+.currency-input:focus { border-color: var(--accent); }
+
+.currency-msg {
+    margin-top: 10px;
+    font-size: 12px;
+    min-height: 14px;
+}
+
+.currency-msg.ok    { color: var(--positive, #66bb6a); }
+.currency-msg.error { color: var(--negative); }
+
 /* ── Gist remote backup ──────────────────────────────────────────────── */
 .gist-card {
     align-items: flex-start;

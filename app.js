@@ -35,6 +35,52 @@ function isSavingsWithdrawal(entry) {
     return entry.type === 'expenses' && entry.category === 'savings';
 }
 
+// ── Currency configuration ───────────────────────────────────────────────
+// The list of tracked currencies and which one is "regional" (the default
+// applied to every transaction that isn't an explicit foreign holding). Kept
+// separate from entries so Settings can edit it and the Gist bundle can sync
+// it. Phase 1 is visual only — no conversion or cross-currency math.
+const CURRENCY_CONFIG_KEY = 'currency_config';
+const DEFAULT_CURRENCY_CONFIG = {
+    regional: 'USD',
+    list: [{ code: 'USD', symbol: '$', name: 'US Dollar' }],
+};
+
+// Where a savings balance physically sits. A visual-only grouping dimension
+// for the Home savings sheet; captured on Savings entries in the Dashboard.
+const HOLDING_TYPES = [
+    { key: 'cash', label: 'Cash' },
+    { key: 'card', label: 'Card' },
+    { key: 'bank', label: 'Bank' },
+    { key: 'other', label: 'Other' },
+];
+
+function getCurrencyConfig() {
+    try {
+        const cfg = JSON.parse(localStorage.getItem(CURRENCY_CONFIG_KEY));
+        if (cfg && Array.isArray(cfg.list) && cfg.list.length && cfg.regional) return cfg;
+    } catch (e) {}
+    return structuredClone(DEFAULT_CURRENCY_CONFIG);
+}
+
+function saveCurrencyConfig(cfg) {
+    localStorage.setItem(CURRENCY_CONFIG_KEY, JSON.stringify(cfg));
+}
+
+function getRegionalCurrency() {
+    return getCurrencyConfig().regional;
+}
+
+function getCurrencyMeta(code) {
+    return getCurrencyConfig().list.find(c => c.code === code)
+        || { code: code || '', symbol: '', name: code || '' };
+}
+
+function getHoldingLabel(key) {
+    const h = HOLDING_TYPES.find(h => h.key === key);
+    return h ? h.label : (key ? capitalize(key) : '—');
+}
+
 const TX_TYPE_ICONS = {
     income:   'ti-trending-up',
     savings:  'ti-coin',
