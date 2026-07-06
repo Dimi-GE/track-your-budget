@@ -295,6 +295,26 @@
     cursor: default;
 }
 
+.backup-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.backup-actions .btn-backup,
+.backup-actions .btn-restore,
+.backup-actions .btn-confirm-yes,
+.backup-actions .btn-confirm-no {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+}
+
+.backup-actions .btn-confirm-row {
+    flex-direction: column;
+    align-items: stretch;
+}
+
 .gist-status {
     margin-top: 12px;
     font-size: 12px;

@@ -75,5 +75,26 @@
                 <button class="btn-backup" id="btn-gist-connect">Connect</button>
             </div>
         </div>
+
+        <div class="settings-card gist-card">
+            <div class="settings-card-body">
+                <div class="settings-item-label">Full Snapshot Backup</div>
+                <div class="settings-item-desc">Save a complete snapshot of <strong>all</strong> data — dashboard entries, currencies, time tracking, and preferences — to a dedicated GitHub Gist, then <em>Restore</em> it on another device. Uses the same token as Gist Sync; create a <strong>separate secret Gist</strong> for this. Restore replaces all current data.</div>
+
+                <div class="gist-fields">
+                    <label class="gist-field">
+                        <span class="gist-field-label">Access token</span>
+                        <input type="password" id="backup-token" class="gist-input" placeholder="ghp_… or github_pat_…" autocomplete="off" spellcheck="false">
+                    </label>
+                    <label class="gist-field">
+                        <span class="gist-field-label">Backup Gist ID</span>
+                        <input type="text" id="backup-id" class="gist-input" placeholder="e.g. 9f8e7d6c5b4a…" autocomplete="off" spellcheck="false">
+                    </label>
+                </div>
+
+                <div class="gist-status" id="backup-status"></div>
+            </div>
+            <div class="settings-item-action backup-actions" id="backup-action"></div>
+        </div>
     </div>
 </div>

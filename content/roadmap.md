@@ -44,6 +44,12 @@ Ability to use agentic LLM via API key.
 
 ## Done
 
+### Remote Full Backup
+Manual full-snapshot backup and restore to a dedicated GitHub Gist, separate
+from the live Dashboard sync. Reuses the same token with its own Gist ID, backs
+up every data key (dashboard, currencies, time tracking, preferences), and
+restores across devices. Credentials are never written into the snapshot.
+
 ### Home View
 Live KPI cards pulling from committed data. Spending trend mini-chart. Recent transactions panel. Currently a visual placeholder.
 

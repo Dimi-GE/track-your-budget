@@ -151,6 +151,63 @@ function initSettings() {
     if (GistSync.isConnected()) renderConnected();
     else renderDisconnected();
 
+    // ── Remote full backup (manual snapshot to a dedicated Gist) ────────────
+    const backupTokenInput = document.getElementById('backup-token');
+    const backupIdInput    = document.getElementById('backup-id');
+    const backupStatusEl   = document.getElementById('backup-status');
+    const backupActionEl   = document.getElementById('backup-action');
+
+    function setBackupStatus(msg, kind) {
+        backupStatusEl.textContent = msg || '';
+        backupStatusEl.className = 'gist-status' + (kind ? ' ' + kind : '');
+    }
+
+    (() => {
+        const { token, gistId } = GistBackup.getConfig();
+        backupTokenInput.value = token;
+        backupIdInput.value    = gistId;
+    })();
+
+    function renderBackupButtons() {
+        backupActionEl.innerHTML = `
+            <button class="btn-backup"  id="btn-remote-backup">Backup</button>
+            <button class="btn-restore" id="btn-remote-restore">Restore</button>`;
+        backupActionEl.querySelector('#btn-remote-backup').addEventListener('click', doRemoteBackup);
+        backupActionEl.querySelector('#btn-remote-restore').addEventListener('click', showRemoteRestoreConfirm);
+    }
+
+    function showRemoteRestoreConfirm() {
+        backupActionEl.innerHTML = `
+            <div class="btn-confirm-row">
+                <button class="btn-confirm-yes">Confirm restore</button>
+                <button class="btn-confirm-no">Cancel</button>
+            </div>`;
+        backupActionEl.querySelector('.btn-confirm-yes').addEventListener('click', doRemoteRestore);
+        backupActionEl.querySelector('.btn-confirm-no').addEventListener('click', renderBackupButtons);
+    }
+
+    async function doRemoteBackup() {
+        const token  = backupTokenInput.value.trim();
+        const gistId = backupIdInput.value.trim();
+        setBackupStatus('Backing up…', '');
+        const res = await GistBackup.backup(token, gistId);
+        if (!res.ok) { setBackupStatus(res.error, 'error'); return; }
+        setBackupStatus(`Backed up all data at ${new Date(res.date).toLocaleString()}.`, 'connected');
+    }
+
+    async function doRemoteRestore() {
+        const token  = backupTokenInput.value.trim();
+        const gistId = backupIdInput.value.trim();
+        setBackupStatus('Restoring…', '');
+        const res = await GistBackup.fetchSnapshot(token, gistId);
+        if (!res.ok) { setBackupStatus(res.error, 'error'); renderBackupButtons(); return; }
+        GistBackup.applySnapshot(res.data);
+        sessionStorage.setItem('activeView', 'home');
+        location.reload();
+    }
+
+    renderBackupButtons();
+
     // ── Currencies ─────────────────────────────────────────────────────────
     const curListEl = document.getElementById('currency-list');
     const curCode   = document.getElementById('cur-code');
