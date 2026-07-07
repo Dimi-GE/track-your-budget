@@ -104,7 +104,12 @@ function renderTxRows(entries) {
                 </div>
                 ${entry.note ? `<div class="tx-note">${entry.note}</div>` : ''}
             </div>
+            <button class="tx-edit" title="Edit entry"><i class="ti ti-pencil"></i></button>
         `;
+        // The entry object is shared with committed.entries, so the editor can
+        // mutate it in place and have the Dashboard re-commit.
+        const editBtn = item.querySelector('.tx-edit');
+        editBtn.addEventListener('click', () => window.openEntryEditor?.(entry));
         txList.appendChild(item);
     });
 }

@@ -18,7 +18,15 @@ Phase 1 — display only, no conversion or cross-currency math.
   spending trend panel, grouped by currency and holding type.
 - Currency config synced through both local JSON backup and the Gist bundle.
 
-Base-currency conversion and calculations remain in the Backlog.
+Base-currency conversion for savings totals is now In Progress; broader
+conversion (Flow, analytics) remains in the Backlog.
+
+### Multi-currency Support (Calculator)
+Approximate conversion of savings into the regional currency, shown on Home's
+Total Saved card and the Dashboard Savings card (prefixed ≈). Live rates from a
+free no-key API with a per-currency manual override, cached and refreshed per
+session. Only the savings totals are converted — Flow and analytics stay
+regional for now.
 
 ## Backlog
 
@@ -28,10 +36,10 @@ Pull document content from the HackMD API. Edit docs collaboratively online, see
 ### PDF: Financial Report Export
 One-click budget report covering a selected period: income, expenses, savings breakdown, and a forecast snapshot.
 
-### Multi-currency Support (Calculations)
-Base-currency conversion with configurable rates, so mixed-currency totals
-(Savings, Flow, analytics) resolve to a single display currency. Builds on the
-visual currency support now In Progress.
+### Multi-currency Support (Full Conversion)
+Extend the savings-total conversion to Flow and all analytics, so every
+mixed-currency figure resolves to the regional display currency. Builds on the
+savings calculator now In Progress.
 
 ### Profiles
 Option to split the dashboard into a seperate project, tracking X financial dashboards separately.
@@ -45,10 +53,12 @@ Ability to use agentic LLM via API key.
 ## Done
 
 ### Remote Full Backup
-Manual full-snapshot backup and restore to a dedicated GitHub Gist, separate
-from the live Dashboard sync. Reuses the same token with its own Gist ID, backs
-up every data key (dashboard, currencies, time tracking, preferences), and
-restores across devices. Credentials are never written into the snapshot.
+Connectable full-snapshot backup to a dedicated GitHub Gist, separate from the
+live Dashboard sync. Connect mirrors Gist Sync (newest-wins baseline), then it
+reconciles per session on app open. Manual Backup / Restore force a push / pull
+and are available only while connected. Reuses the same token with its own Gist
+ID; backs up every data key (dashboard, currencies, time tracking, preferences).
+Credentials are never written into the snapshot.
 
 ### Home View
 Live KPI cards pulling from committed data. Spending trend mini-chart. Recent transactions panel. Currently a visual placeholder.
@@ -93,7 +103,7 @@ Four summary cards: Income, Savings, Total Expenses, and Flow. Flow is the net r
 Bar chart breaking down spending across all 12 categories for a selected period. Per-category colours and icons rendered on the chart canvas. Toggleable legend. Period-scoped export and import separate from the global backup.
 
 ### Recent Transactions
-Reverse-chronological list of all committed entries. Type and context-aware category filters. Full History overlay mode.
+Reverse-chronological list of all committed entries. Type and context-aware category filters. Full History overlay mode. Per-entry edit button opens a modal to change any field (date, amount, type, category, currency, holding, note) and re-commits immediately.
 
 ### Analytics — Activity Intensity
 Day-level heatmaps for spending and earnings. Quartile-based colour levels within the displayed quarter. Quarter and year navigation. Sync toggle keeps both maps on the same period.

@@ -46,7 +46,7 @@ Each staged entry shows date, amount, type, and category. Individual entries can
 Four cards showing cumulative totals across the entire committed dataset (no period filter — these are all-time sums):
 
 - **Income** — total of all income entries, including Starting Funds.
-- **Savings** — net reserve balance: total of all savings entries minus any *Savings* withdrawals (Expenses type, Savings category).
+- **Savings** — net reserve balance: total of all savings entries minus any *Savings* withdrawals (Expenses type, Savings category). Shown as an **approximate total converted into the regional currency** (prefixed `≈`), since savings may hold foreign currencies via *Savings → Other*. Rates are managed in Settings → Exchange Rates.
 - **Total Expenses** — sum of all expense entries across all categories.
 - **Flow** — the net result: `Income − Savings (Flow type only) − Expenses`. This is what you actually have available after obligations are met. The Flow card is visually highlighted as it's the single most important number on the dashboard.
 
@@ -77,5 +77,7 @@ A reverse-chronological list of all committed entries, displayed below the expen
 **Filters** — two dropdowns at the top of the section: type (Income / Savings / Expenses / All) and category. The category dropdown is context-aware — it only shows categories that actually appear in the entries matching the current type filter, not the full static list.
 
 **Full History** — by default the list shows a compact view. Clicking *Full History* expands it into an overlay panel that covers the page, with a backdrop click to dismiss. This keeps the dashboard uncluttered day-to-day while still providing access to the complete record when needed.
+
+**Editing entries** — each row (in both the compact and expanded states) has a pencil button that opens an editor modal for that committed entry. All fields are editable — date, amount, type, category, currency, holding, and note — following the same rules as the New Entry form (category list depends on type; currency locks to the regional currency except for *Savings → Other*; holding shows only for Savings). Saving recalculates all totals, persists, pushes to any connected sync, and re-renders every view immediately. This replaces the previous export-edit-reimport workaround for fixing mistakes such as a wrong date.
 
 ---

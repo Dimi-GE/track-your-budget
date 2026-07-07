@@ -52,6 +52,22 @@
     </div>
 
     <div class="settings-section">
+        <div class="section-title">Exchange Rates</div>
+        <div class="settings-card currency-card">
+            <div class="settings-card-body">
+                <div class="settings-item-label">Savings Conversion</div>
+                <div class="settings-item-desc">The approximate savings totals on Home and the Dashboard are converted into your regional currency (<strong id="rates-base">—</strong>) using these rates. <em>Refresh</em> pulls fresh live rates; a manual override wins for a currency when set (leave blank to use the live rate).</div>
+
+                <div class="rates-list" id="rates-list"></div>
+                <div class="rates-meta gist-status" id="rates-meta"></div>
+            </div>
+            <div class="settings-item-action" id="rates-action">
+                <button class="btn-backup" id="btn-rates-refresh">Refresh</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="settings-section">
         <div class="section-title">Remote Backup</div>
         <div class="settings-card gist-card">
             <div class="settings-card-body">
@@ -79,7 +95,7 @@
         <div class="settings-card gist-card">
             <div class="settings-card-body">
                 <div class="settings-item-label">Full Snapshot Backup</div>
-                <div class="settings-item-desc">Save a complete snapshot of <strong>all</strong> data — dashboard entries, currencies, time tracking, and preferences — to a dedicated GitHub Gist, then <em>Restore</em> it on another device. Uses the same token as Gist Sync; create a <strong>separate secret Gist</strong> for this. Restore replaces all current data.</div>
+                <div class="settings-item-desc"><strong>Connect</strong> to a dedicated GitHub Gist to keep a complete snapshot of <strong>all</strong> data — dashboard entries, currencies, time tracking, and preferences. While connected it syncs newest-wins each time you open the app, and <em>Backup</em> / <em>Restore</em> force a push / pull. Uses the same token as Gist Sync; create a <strong>separate secret Gist</strong> for this. Restore replaces all current data.</div>
 
                 <div class="gist-fields">
                     <label class="gist-field">

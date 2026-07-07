@@ -8,7 +8,7 @@ The Home view is the landing page of the app. It gives an at-a-glance picture of
 
 Four cards at the top summarise the most important numbers at a glance.
 
-- **Total Saved** — all-time net reserve balance: cumulative savings across every category and period, minus any *Savings* withdrawals (Expenses type, Savings category). This is the running total from the first entry to the most recent, not scoped to any month.
+- **Total Saved** — all-time net reserve balance: cumulative savings across every category and period, minus any *Savings* withdrawals (Expenses type, Savings category). This is the running total from the first entry to the most recent, not scoped to any month. Because savings can sit in foreign currencies (via *Savings → Other*), this figure is an **approximate total converted into the regional currency** and is prefixed with `≈`. Conversion uses the exchange rates managed in Settings (live rates with optional manual overrides); currencies without a known rate are counted at face value.
 - **Monthly Income** — income recorded in the reference month (see below).
 - **Monthly Expenses** — total expenses recorded in the reference month.
 - **Cash Flow** — the net result for the reference month: `Income − Savings (Flow type only) − Expenses`. Turns red when negative.

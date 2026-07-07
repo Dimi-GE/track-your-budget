@@ -213,14 +213,168 @@ function initDashboard() {
         renderTxList(committed.entries);
         renderExpensesChart(committed.entries);
         saveToStorage();
+        // Stamp local freshness on every commit, independent of any sync
+        // connection, so both Gist Sync and the full backup can compare ages.
+        window.GistSync?.markLocalModified?.();
         pushToGist();
     }
     window.applyPeriodImport = applyCommitted;
 
+    // --- Entry editor (edit committed entries from the Full History list) ---
+    let editorEls   = null;
+    let editingEntry = null;
+
+    function escHandler(e) { if (e.key === 'Escape') closeEditor(); }
+
+    function buildEditor() {
+        // Drop any editor left over from a previous init of this view.
+        document.querySelectorAll('.entry-editor-backdrop, .entry-editor').forEach(el => el.remove());
+
+        const wrap = document.createElement('div');
+        wrap.innerHTML = `
+            <div class="entry-editor-backdrop" id="entry-editor-backdrop"></div>
+            <div class="entry-editor" id="entry-editor" role="dialog" aria-modal="true" aria-label="Edit entry">
+                <div class="entry-editor__title">Edit Entry</div>
+                <div class="entry-editor__grid">
+                    <label class="entry-editor__field"><span>Date</span><input type="date" id="edit-date"></label>
+                    <label class="entry-editor__field"><span>Amount</span><input type="number" id="edit-amount" step="0.01"></label>
+                    <label class="entry-editor__field"><span>Type</span>
+                        <select id="edit-type">
+                            <option value="income">Income</option>
+                            <option value="savings">Savings</option>
+                            <option value="expenses">Expenses</option>
+                        </select>
+                    </label>
+                    <label class="entry-editor__field"><span>Category</span><select id="edit-category"></select></label>
+                    <label class="entry-editor__field" id="edit-currency-field"><span>Currency</span><select id="edit-currency"></select></label>
+                    <label class="entry-editor__field" id="edit-holding-field"><span>Holding</span><select id="edit-holding"></select></label>
+                    <label class="entry-editor__field entry-editor__field--full"><span>Note</span><input type="text" id="edit-note" placeholder="Note (optional)"></label>
+                </div>
+                <div class="entry-editor__actions">
+                    <button class="btn-secondary" id="edit-cancel">Cancel</button>
+                    <button class="btn-apply" id="edit-save">Save</button>
+                </div>
+            </div>`;
+        document.body.appendChild(wrap);
+
+        editorEls = {
+            backdrop:      wrap.querySelector('#entry-editor-backdrop'),
+            modal:         wrap.querySelector('#entry-editor'),
+            date:          wrap.querySelector('#edit-date'),
+            amount:        wrap.querySelector('#edit-amount'),
+            type:          wrap.querySelector('#edit-type'),
+            category:      wrap.querySelector('#edit-category'),
+            currency:      wrap.querySelector('#edit-currency'),
+            holding:       wrap.querySelector('#edit-holding'),
+            currencyField: wrap.querySelector('#edit-currency-field'),
+            holdingField:  wrap.querySelector('#edit-holding-field'),
+            note:          wrap.querySelector('#edit-note'),
+            save:          wrap.querySelector('#edit-save'),
+            cancel:        wrap.querySelector('#edit-cancel'),
+        };
+
+        editorEls.holding.innerHTML = HOLDING_TYPES
+            .map(h => `<option value="${h.key}">${h.label}</option>`).join('');
+
+        editorEls.type.addEventListener('change', () => {
+            populateEditCategories();
+            updateEditCurrencyHolding();
+        });
+        editorEls.category.addEventListener('change', updateEditCurrencyHolding);
+        editorEls.cancel.addEventListener('click', closeEditor);
+        editorEls.backdrop.addEventListener('click', closeEditor);
+        editorEls.save.addEventListener('click', saveEditor);
+    }
+
+    // Options mirror the New Entry form, minus Starting Funds when it is locked
+    // (unless this very entry is the Starting Funds record).
+    function populateEditCategories(selected) {
+        editorEls.category.innerHTML = '';
+        categories[editorEls.type.value].forEach(cat => {
+            const value = cat.toLowerCase().replace(/ /g, '_');
+            if (value === 'starting_funds' && startingFundsLocked && selected !== 'starting_funds') return;
+            const opt = document.createElement('option');
+            opt.value = value;
+            opt.textContent = cat;
+            editorEls.category.appendChild(opt);
+        });
+        if (selected) editorEls.category.value = selected;
+    }
+
+    function updateEditCurrencyHolding() {
+        const type     = editorEls.type.value;
+        const category = editorEls.category.value;
+        const regional = getRegionalCurrency();
+        editorEls.holdingField.style.display = type === 'savings' ? '' : 'none';
+        if (type === 'savings' && category === 'other') {
+            editorEls.currency.disabled = false;
+        } else {
+            editorEls.currency.value = regional;
+            editorEls.currency.disabled = true;
+        }
+    }
+
+    function openEntryEditor(entry) {
+        if (!editorEls) buildEditor();
+        editingEntry = entry;
+
+        editorEls.currency.innerHTML = getCurrencyConfig().list
+            .map(c => `<option value="${c.code}">${c.symbol ? c.code + ' ' + c.symbol : c.code}</option>`).join('');
+
+        editorEls.date.value   = entry.date;
+        editorEls.amount.value = entry.amount;
+        editorEls.type.value   = entry.type;
+        populateEditCategories(entry.category);
+        editorEls.holding.value = entry.holding || HOLDING_TYPES[0].key;
+        editorEls.note.value    = entry.note || '';
+        updateEditCurrencyHolding();
+        // Restore the entry's currency where the field is editable (Savings → Other).
+        editorEls.currency.value = editorEls.currency.disabled
+            ? getRegionalCurrency()
+            : (entry.currency || getRegionalCurrency());
+
+        editorEls.backdrop.classList.add('open');
+        editorEls.modal.classList.add('open');
+        document.addEventListener('keydown', escHandler);
+    }
+    window.openEntryEditor = openEntryEditor;
+
+    function closeEditor() {
+        document.removeEventListener('keydown', escHandler);
+        if (!editorEls) return;
+        editorEls.backdrop.classList.remove('open');
+        editorEls.modal.classList.remove('open');
+        editingEntry = null;
+    }
+
+    function saveEditor() {
+        if (!editingEntry) return;
+        const amount = parseFloat(editorEls.amount.value);
+        if (isNaN(amount)) { editorEls.amount.focus(); return; }
+        const type          = editorEls.type.value;
+        const category      = editorEls.category.value;
+        const categoryLabel = editorEls.category.options[editorEls.category.selectedIndex]?.text || category;
+        const note          = editorEls.note.value.trim();
+        const currency      = editorEls.currency.disabled ? getRegionalCurrency() : editorEls.currency.value;
+
+        editingEntry.date          = editorEls.date.value;
+        editingEntry.amount        = amount;
+        editingEntry.type          = type;
+        editingEntry.category      = category;
+        editingEntry.categoryLabel = categoryLabel;
+        editingEntry.currency      = currency;
+        if (type === 'savings') editingEntry.holding = editorEls.holding.value;
+        else delete editingEntry.holding;
+        if (note) editingEntry.note = note; else delete editingEntry.note;
+
+        closeEditor();
+        applyCommitted([...committed.entries]);   // recalc, persist, push, re-render
+    }
+
     // --- Remote backup (push on commit if connected) ---
     function pushToGist() {
         if (!window.GistSync?.isConnected()) return;
-        const date = GistSync.markLocalModified();
+        const date = GistSync.getLocalMtime();
         GistSync.push({ committed, currency: getCurrencyConfig() }, date)
             .then(() => console.log('[gist] pushed at', date))
             .catch(e => console.warn('[gist] push failed:', e.message));
@@ -229,9 +383,17 @@ function initDashboard() {
     // --- Cards ---
     function updateCards() {
         document.getElementById('display-income').textContent   = committed.income.toFixed(2);
-        document.getElementById('display-savings').textContent  = committed.savings.toFixed(2);
         document.getElementById('display-expenses').textContent = committed.expenses.toFixed(2);
         document.getElementById('display-flow').textContent     = committed.flow.toFixed(2);
+        // Savings may hold foreign currencies (Savings → Other): show an
+        // approximate total converted into the regional currency.
+        const savingsEl = document.getElementById('display-savings');
+        if (window.FxRates) {
+            savingsEl.textContent = '≈ ' + FxRates.netSavingsRegional(committed.entries).toFixed(2);
+            savingsEl.title = 'Approximate total in ' + getRegionalCurrency();
+        } else {
+            savingsEl.textContent = committed.savings.toFixed(2);
+        }
     }
 
     // --- Export ---

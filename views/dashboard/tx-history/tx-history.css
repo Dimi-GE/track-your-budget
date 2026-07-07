@@ -135,3 +135,24 @@
     padding: 2px 6px;
     border-radius: 3px;
 }
+
+.tx-edit {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    align-self: center;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.tx-edit:hover {
+    color: var(--accent);
+    background-color: var(--card-border);
+}
+
+.tx-edit i { pointer-events: none; }

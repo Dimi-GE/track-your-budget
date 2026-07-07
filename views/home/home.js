@@ -26,11 +26,17 @@ function initHome() {
     } catch (e) {}
 
     // --- All-time total saved (deposits minus reserve withdrawals) ---
+    // Approximate, converted into the regional currency when FX rates are
+    // available (savings may sit in foreign currencies via Savings → Other).
     let totalSaved = 0;
-    entries.forEach(e => {
-        if (e.type === 'savings') totalSaved += e.amount;
-        else if (isSavingsWithdrawal(e)) totalSaved -= e.amount;
-    });
+    if (window.FxRates) {
+        totalSaved = FxRates.netSavingsRegional(entries);
+    } else {
+        entries.forEach(e => {
+            if (e.type === 'savings') totalSaved += e.amount;
+            else if (isSavingsWithdrawal(e)) totalSaved -= e.amount;
+        });
+    }
 
     // --- Resolve reference month ---
     // Use the current month if it has income; otherwise fall back to the most
@@ -96,7 +102,9 @@ function initHome() {
     const monthCashFlow = monthIncome - monthSavingsFlow - monthExpenses;
 
     // --- KPI Cards ---
-    document.getElementById('home-total-saved').textContent      = totalSaved.toFixed(2);
+    const totalSavedEl = document.getElementById('home-total-saved');
+    totalSavedEl.textContent = '≈ ' + totalSaved.toFixed(2);
+    totalSavedEl.title = 'Approximate total in ' + getRegionalCurrency();
     document.getElementById('home-monthly-income').textContent   = monthIncome.toFixed(2);
     document.getElementById('home-monthly-expenses').textContent = monthExpenses.toFixed(2);
 

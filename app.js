@@ -191,6 +191,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         try { await GistSync.reconcileOnOpen(); }
         catch (e) { console.warn('[gist] reconcile skipped:', e.message); }
     }
+    // Full-snapshot backup: per-session reconcile (pull or push by newest).
+    if (window.GistBackup?.isConnected()) {
+        try {
+            const { action } = await GistBackup.reconcileOnOpen();
+            if (action && action !== 'none' && action !== 'insync') {
+                console.log('[gist-backup] session reconcile:', action);
+            }
+        } catch (e) { console.warn('[gist-backup] reconcile skipped:', e.message); }
+    }
+    // Refresh FX rates if stale, but never let a slow rates service block the
+    // UI — cap the wait and fall back to cached rates (totals are approximate).
+    if (window.FxRates) {
+        const cap = new Promise(res => setTimeout(res, 2500));
+        try { await Promise.race([FxRates.maybeRefresh(), cap]); }
+        catch (e) { console.warn('[fx] rate refresh skipped:', e.message); }
+    }
     // Views unwired from the UI (kept in code, unavailable to users).
     const DISABLED_VIEWS = ['time-tracking'];
     const saved = sessionStorage.getItem('activeView');

@@ -1,5 +1,5 @@
 function initSettings() {
-    const STORAGE_KEYS = ['dashboard_committed', 'currency_config', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
+    const STORAGE_KEYS = ['dashboard_committed', 'currency_config', 'currency_rates', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
 
     // ── Backup ─────────────────────────────────────────────────────────────
     document.getElementById('btn-backup').addEventListener('click', () => {
@@ -151,29 +151,79 @@ function initSettings() {
     if (GistSync.isConnected()) renderConnected();
     else renderDisconnected();
 
-    // ── Remote full backup (manual snapshot to a dedicated Gist) ────────────
+    // ── Remote full backup (connect + per-session sync, manual push/pull) ───
     const backupTokenInput = document.getElementById('backup-token');
     const backupIdInput    = document.getElementById('backup-id');
     const backupStatusEl   = document.getElementById('backup-status');
     const backupActionEl   = document.getElementById('backup-action');
+
+    const BACKUP_MESSAGES = {
+        seeded: 'Connected — your data was uploaded to this Gist.',
+        pulled: 'Connected — pulled newer data from this Gist. Reopen views to see it.',
+        pushed: 'Connected — your data is now backed up to this Gist.',
+        insync: 'Connected — already up to date.',
+        none:   'Connected — no data yet; use Backup once you have some.',
+    };
 
     function setBackupStatus(msg, kind) {
         backupStatusEl.textContent = msg || '';
         backupStatusEl.className = 'gist-status' + (kind ? ' ' + kind : '');
     }
 
-    (() => {
+    function renderBackupConnected() {
         const { token, gistId } = GistBackup.getConfig();
         backupTokenInput.value = token;
         backupIdInput.value    = gistId;
-    })();
-
-    function renderBackupButtons() {
+        backupTokenInput.disabled = true;
+        backupIdInput.disabled    = true;
         backupActionEl.innerHTML = `
             <button class="btn-backup"  id="btn-remote-backup">Backup</button>
-            <button class="btn-restore" id="btn-remote-restore">Restore</button>`;
+            <button class="btn-restore" id="btn-remote-restore">Restore</button>
+            <button class="btn-gist-disconnect" id="btn-backup-disconnect">Disconnect</button>`;
         backupActionEl.querySelector('#btn-remote-backup').addEventListener('click', doRemoteBackup);
         backupActionEl.querySelector('#btn-remote-restore').addEventListener('click', showRemoteRestoreConfirm);
+        backupActionEl.querySelector('#btn-backup-disconnect').addEventListener('click', doBackupDisconnect);
+    }
+
+    function renderBackupDisconnected() {
+        backupTokenInput.disabled = false;
+        backupIdInput.disabled    = false;
+        backupActionEl.innerHTML = '<button class="btn-backup" id="btn-backup-connect">Connect</button>';
+        backupActionEl.querySelector('#btn-backup-connect').addEventListener('click', doBackupConnect);
+    }
+
+    async function doBackupConnect() {
+        const token  = backupTokenInput.value.trim();
+        const gistId = backupIdInput.value.trim();
+        const btn = backupActionEl.querySelector('#btn-backup-connect');
+        btn.disabled = true;
+        setBackupStatus('Verifying…', '');
+        const result = await GistSync.validate(token, gistId);   // same token/gist API
+        if (!result.ok) { setBackupStatus(result.error, 'error'); btn.disabled = false; return; }
+        GistBackup.saveConfig(token, gistId);
+        renderBackupConnected();
+        try {
+            const { action } = await GistBackup.establishConnection();
+            setBackupStatus(BACKUP_MESSAGES[action] || BACKUP_MESSAGES.none, 'connected');
+        } catch (e) {
+            console.warn('[gist-backup] establish failed:', e.message);
+            setBackupStatus('Connected, but the initial sync failed — check the console.', 'error');
+        }
+    }
+
+    function doBackupDisconnect() {
+        GistBackup.clearConfig();
+        backupIdInput.value = '';
+        renderBackupDisconnected();
+        setBackupStatus('', '');
+    }
+
+    async function doRemoteBackup() {
+        setBackupStatus('Backing up…', '');
+        try {
+            const date = await GistBackup.backupNow();
+            setBackupStatus(`Backed up all data at ${new Date(date).toLocaleString()}.`, 'connected');
+        } catch (e) { setBackupStatus(`Backup failed — ${e.message}`, 'error'); }
     }
 
     function showRemoteRestoreConfirm() {
@@ -183,30 +233,20 @@ function initSettings() {
                 <button class="btn-confirm-no">Cancel</button>
             </div>`;
         backupActionEl.querySelector('.btn-confirm-yes').addEventListener('click', doRemoteRestore);
-        backupActionEl.querySelector('.btn-confirm-no').addEventListener('click', renderBackupButtons);
-    }
-
-    async function doRemoteBackup() {
-        const token  = backupTokenInput.value.trim();
-        const gistId = backupIdInput.value.trim();
-        setBackupStatus('Backing up…', '');
-        const res = await GistBackup.backup(token, gistId);
-        if (!res.ok) { setBackupStatus(res.error, 'error'); return; }
-        setBackupStatus(`Backed up all data at ${new Date(res.date).toLocaleString()}.`, 'connected');
+        backupActionEl.querySelector('.btn-confirm-no').addEventListener('click', renderBackupConnected);
     }
 
     async function doRemoteRestore() {
-        const token  = backupTokenInput.value.trim();
-        const gistId = backupIdInput.value.trim();
         setBackupStatus('Restoring…', '');
-        const res = await GistBackup.fetchSnapshot(token, gistId);
-        if (!res.ok) { setBackupStatus(res.error, 'error'); renderBackupButtons(); return; }
-        GistBackup.applySnapshot(res.data);
-        sessionStorage.setItem('activeView', 'home');
-        location.reload();
+        try {
+            await GistBackup.restoreNow();
+            sessionStorage.setItem('activeView', 'home');
+            location.reload();
+        } catch (e) { setBackupStatus(`Restore failed — ${e.message}`, 'error'); renderBackupConnected(); }
     }
 
-    renderBackupButtons();
+    if (GistBackup.isConnected()) renderBackupConnected();
+    else renderBackupDisconnected();
 
     // ── Currencies ─────────────────────────────────────────────────────────
     const curListEl = document.getElementById('currency-list');
@@ -224,6 +264,7 @@ function initSettings() {
     // list follows the user across devices even without a Dashboard commit.
     function persistCurrency(cfg) {
         saveCurrencyConfig(cfg);
+        window.GistSync?.markLocalModified?.();   // freshness stamp, connection-independent
         if (window.GistSync?.isConnected()) {
             GistSync.pushLocal().catch(e => console.warn('[gist] currency push failed:', e.message));
         }
@@ -283,11 +324,79 @@ function initSettings() {
         persistCurrency(cfg);
         setCurMsg(`${code} is now the regional currency.`, 'ok');
         renderCurrencies();
+        // Changing the base invalidates cached live rates — refetch and redraw.
+        renderRates();
+        doRatesRefresh();
     }
 
     document.getElementById('btn-cur-add').addEventListener('click', addCurrency);
     curName.addEventListener('keydown', e => { if (e.key === 'Enter') addCurrency(); });
     renderCurrencies();
+
+    // ── Exchange rates ──────────────────────────────────────────────────────
+    const ratesListEl = document.getElementById('rates-list');
+    const ratesMetaEl = document.getElementById('rates-meta');
+    const ratesBaseEl = document.getElementById('rates-base');
+    const btnRatesRefresh = document.getElementById('btn-rates-refresh');
+
+    function setRatesMeta(msg, kind) {
+        ratesMetaEl.textContent = msg || '';
+        ratesMetaEl.className = 'rates-meta gist-status' + (kind ? ' ' + kind : '');
+    }
+
+    function renderRates() {
+        const cfg  = getCurrencyConfig();
+        const base = cfg.regional;
+        ratesBaseEl.textContent = base;
+
+        const stored  = FxRates.getRates();
+        const foreign = cfg.list.filter(c => c.code !== base);
+
+        if (foreign.length === 0) {
+            ratesListEl.innerHTML = '<div class="rates-empty">Only the regional currency is defined — no conversion needed.</div>';
+        } else {
+            ratesListEl.innerHTML = foreign.map(c => {
+                const override = stored.overrides[c.code];
+                const live     = stored.rates[c.code];
+                const src = override != null ? 'manual'
+                          : live     != null ? 'live'
+                          : 'no rate';
+                const placeholder = live != null ? live.toFixed(4) : 'set rate';
+                const value = override != null ? override : '';
+                return `
+                    <div class="rate-row">
+                        <span class="rate-pair">1 <b>${c.code}</b> =</span>
+                        <input type="number" class="rate-override" data-code="${c.code}"
+                               step="0.0001" min="0" placeholder="${placeholder}" value="${value}">
+                        <span class="rate-base-code">${base}</span>
+                        <span class="rate-src rate-src--${src.replace(' ', '-')}">${src}</span>
+                    </div>`;
+            }).join('');
+
+            ratesListEl.querySelectorAll('.rate-override').forEach(inp =>
+                inp.addEventListener('change', () => {
+                    FxRates.setOverride(inp.dataset.code, inp.value.trim());
+                    window.GistSync?.markLocalModified?.();
+                    renderRates();
+                }));
+        }
+
+        const stamp = stored.updated ? new Date(stored.updated).toLocaleString() : null;
+        if (stamp) setRatesMeta(`Live rates updated: ${stamp}.`, '');
+        else       setRatesMeta('No live rates fetched yet — press Refresh.', '');
+    }
+
+    async function doRatesRefresh() {
+        btnRatesRefresh.disabled = true;
+        setRatesMeta('Refreshing…', '');
+        const res = await FxRates.refresh();
+        btnRatesRefresh.disabled = false;
+        if (!res.ok) { setRatesMeta(res.error, 'error'); return; }
+        renderRates();
+    }
+
+    btnRatesRefresh.addEventListener('click', doRatesRefresh);
+    renderRates();
 
     window.viewReady?.();
 }

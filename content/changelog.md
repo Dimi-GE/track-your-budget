@@ -1,10 +1,24 @@
-## v0.0.2b — July 2026
+## v0.0.2b.0 — July 2026
 
+- `feature` Dashboard — multi-currency (visual): each entry carries a currency, chosen between Category and Note; it defaults to and locks on the regional currency, unlocking only for a Savings → Other entry (reserve money from outside the Flow)
+- `feature` Dashboard — holding type (Cash, Card, Bank, Other) captured on Savings entries, recording where a balance physically sits
+- `feature` Settings — Currencies section: add or remove currencies (code, symbol, name) and mark one as the regional default (starred); the list and regional choice sync through both local backup and the Gist bundle
+- `feature` Home — Savings Holdings sheet replaces the Spending Trend panel: savings grouped by currency and holding type as an Amount | Currency | Type table
+- `feature` Currency calculator — Home Total Saved and Dashboard Savings cards show an approximate total converted into the regional currency (prefixed ≈); Flow and analytics stay regional for now
+- `feature` Settings — Exchange Rates section: live rates from a free no-key API (open.er-api.com) keyed to the regional currency, cached and refreshed per session (at most ~twice daily), with a per-currency manual override that wins; changing the regional currency refetches
+- `feature` Settings — Full Snapshot Backup: connect a dedicated Gist (same token, separate Gist ID) holding every data key; Connect establishes a newest-wins baseline and each app open reconciles per session, while manual Backup / Restore force a push / pull and are available only while connected; credentials are never written into the snapshot
+- `feature` Dashboard — edit committed entries: a pencil button on every Recent Transactions row (compact and Full History) opens a modal to change any field (date, amount, type, category, currency, holding, note), then recalculates totals, persists, pushes to sync, and re-renders every view — replacing the export-edit-reimport workaround
+- `improvement` Remote backup — local freshness (`gist_local_mtime`) is stamped on every commit and currency change regardless of sync connection, so both Gist Sync and the full backup compare ages correctly
+- `improvement` Home — Recent Transactions ordering fixed so entries sharing a date show the most-recently-committed first; category labels are now plain white and amounts are green for income and savings, red for expenses
+- `fix` Settings — Exchange Rates "updated" line used an unreadable dark colour on the dark theme; now matches the muted description text
+- `docs` DASHBOARD.md and HOME.md updated for the currency field, holding type, savings conversion, and entry editing
+
+## v0.0.2b — July 2026
 - `feature` Settings — GitHub Gist Sync: connect a personal access token (gist scope) and a Gist ID to back up dashboard data to a remote JSON file; the token is stored only in this browser's localStorage
 - `feature` Settings — Connect/Disconnect toggle verifies the token and Gist against GitHub before saving; on connect the fields lock and a status line confirms the link, on disconnect the token is cleared from both the field and localStorage
 - `feature` Remote backup — smart connect establishes a baseline on first link: seeds an empty Gist with local data, adopts the remote copy when it is newer, or pushes local when it is newer; ties and un-comparable timestamps keep local (least destructive)
 - `feature` Remote backup — dashboard Apply pushes committed data to the Gist, and the app pulls once on open and adopts the remote copy when newer (newest-wins via `_meta.date`)
-- `feature` Remote backup — synced JSON mirrors the dashboard export structure (`entries` plus a `_meta.date`) so the Gist file stays interchangeable with manual file backups
+- `feature` Remote backup — synced JSON is a bundle of `committed` plus `currency_config` wrapped with a `_meta.date`; pull stays backward-compatible with the earlier top-level `entries` shape so existing Gists keep working, and the file remains interchangeable with manual backups
 - `feature` Dashboard — Savings expense category: a withdrawal from the reserve, available only when Type is Expenses; it nets down the Savings balance instead of counting as an expense and leaves Flow untouched
 - `improvement` Savings withdrawals excluded from all expense analytics — Expenses by Category chart, Home expense breakdown and spending trend, and Behavior Analytics trends, spending heatmap, and forecast — keeping those focused on income-funded spending
 - `improvement` Savings totals now net of withdrawals across the Overview Savings card and Home Total Saved; `isSavingsWithdrawal()` helper added to app.js so the rule is defined once and applied consistently
