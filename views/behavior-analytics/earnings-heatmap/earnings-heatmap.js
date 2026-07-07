@@ -63,7 +63,9 @@ function initEarningsHeatmap() {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (raw) {
                 (JSON.parse(raw).entries || [])
-                    .filter(e => e.type === 'income')
+                    // Opening balance excluded: a one-time large sum would peg
+                    // the quartile scale and crush real earning days.
+                    .filter(e => e.type === 'income' && !isOpeningBalance(e))
                     .forEach(e => {
                         if (!e.date) return;
                         const d = new Date(e.date + 'T00:00:00');

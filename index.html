@@ -21,5 +21,8 @@
     <script src="data/gist-backup.js"></script>
     <script src="data/fx-rates.js"></script>
     <script src="app.js"></script>
+    <!-- Core math loaded globally so any view can call recalculateTotals()
+         synchronously and share the single Flow formula. -->
+    <script src="engine/calculator.js"></script>
 </body>
 </html>

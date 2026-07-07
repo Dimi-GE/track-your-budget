@@ -7,7 +7,7 @@
 
 .tx-container.expanded {
     transform: translateX(-8px) scaleX(1.008);
-    margin-top: -600px;
+    margin-top: -400px;
     margin-bottom: 0;
     box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.6);
     z-index: 100;

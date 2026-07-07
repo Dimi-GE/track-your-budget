@@ -8,26 +8,6 @@ Guided introduction to the app covering the data entry workflow, what Flow means
 
 ## In Progress
 
-### Multi-currency Support (Visual)
-Phase 1 — display only, no conversion or cross-currency math.
-- Per-transaction currency field on the Dashboard entry form, defaulting to
-  the regional currency and unlocked only for Savings → Other.
-- Holding type (Cash, Card, Bank, Other) captured on Savings entries.
-- Settings: manage the currency list and set the regional currency.
-- Home: savings holdings sheet (Amount | Currency | Type) replacing the
-  spending trend panel, grouped by currency and holding type.
-- Currency config synced through both local JSON backup and the Gist bundle.
-
-Base-currency conversion for savings totals is now In Progress; broader
-conversion (Flow, analytics) remains in the Backlog.
-
-### Multi-currency Support (Calculator)
-Approximate conversion of savings into the regional currency, shown on Home's
-Total Saved card and the Dashboard Savings card (prefixed ≈). Live rates from a
-free no-key API with a per-currency manual override, cached and refreshed per
-session. Only the savings totals are converted — Flow and analytics stay
-regional for now.
-
 ## Backlog
 
 ### HackMD Integration
@@ -51,6 +31,26 @@ Ability to make custom widgets/sections (board constructor?).
 Ability to use agentic LLM via API key.
 
 ## Done
+
+### Multi-currency Support (Visual)
+Phase 1 — display only, no conversion or cross-currency math.
+- Per-transaction currency field on the Dashboard entry form, defaulting to
+  the regional currency and unlocked only for Savings → Other.
+- Holding type (Cash, Card, Bank, Other) captured on Savings entries.
+- Settings: manage the currency list and set the regional currency.
+- Home: savings holdings sheet (Amount | Currency | Type) replacing the
+  spending trend panel, grouped by currency and holding type.
+- Currency config synced through both local JSON backup and the Gist bundle.
+
+Base-currency conversion for savings totals is now In Progress; broader
+conversion (Flow, analytics) remains in the Backlog.
+
+### Multi-currency Support (Calculator)
+Approximate conversion of savings into the regional currency, shown on Home's
+Total Saved card and the Dashboard Savings card (prefixed ≈). Live rates from a
+free no-key API with a per-currency manual override, cached and refreshed per
+session. Only the savings totals are converted — Flow and analytics stay
+regional for now.
 
 ### Remote Full Backup
 Connectable full-snapshot backup to a dedicated GitHub Gist, separate from the
@@ -109,7 +109,7 @@ Reverse-chronological list of all committed entries. Type and context-aware cate
 Day-level heatmaps for spending and earnings. Quartile-based colour levels within the displayed quarter. Quarter and year navigation. Sync toggle keeps both maps on the same period.
 
 ### Analytics — Trends
-Line chart for income, expenses, savings, and cash flow. Week, month, and quarter granularity covering recent history.
+12-month line chart for income, expenses, savings, and cash flow across a user-selected budget year (own start-month/year picker, saved across sessions). Historical counterpart to Forecasting: shares the same engine but plots recorded months only — future months in the window are left off rather than projected.
 
 ### Analytics — Forecasting
 Rolling 12-month budget year projection from a user-selected start month. Weighted average built from historical months — recent months carry more weight. Chart splits at today: solid lines for actuals, dashed for projections. Three-value summary cards: to date, projected remaining, and year-end total.

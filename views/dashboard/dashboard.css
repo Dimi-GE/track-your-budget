@@ -274,42 +274,6 @@
 .btn-apply:hover:not(:disabled) { opacity: 0.85; }
 .btn-apply:disabled { opacity: 0.3; cursor: default; }
 
-/* Info Cards */
-.cards-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.info-card {
-    flex: 1;
-    min-width: 120px;
-    background-color: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 4px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.info-card.highlight { border-color: var(--accent); }
-
-.card-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--text-muted);
-}
-
-.card-value {
-    font-size: 24px;
-    font-weight: bold;
-    color: var(--text-primary);
-}
-
-.info-card.highlight .card-value { color: var(--accent); }
-
 /* Chart placeholder */
 .chart-placeholder {
     background-color: var(--card-bg);

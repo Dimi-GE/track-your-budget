@@ -53,7 +53,7 @@ function initHome() {
         let income = 0, expenses = 0, savings = 0, savingsFlow = 0, rent = 0;
         me.forEach(e => {
             if (e.type === 'income') {
-                income += e.amount;
+                if (!isOpeningBalance(e)) income += e.amount;   // opening balance is not earned income
             } else if (isSavingsWithdrawal(e)) {
                 savings -= e.amount;              // reserve drawdown, not an expense
             } else if (e.type === 'expenses') {
@@ -93,13 +93,20 @@ function initHome() {
         .toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     const periodEl = document.getElementById('home-health-period');
     if (periodEl) periodEl.textContent = periodLabel;
-    const monthEntries  = ref.entries;
-    const monthIncome   = ref.income;
-    const monthExpenses = ref.expenses;
-    const monthSavings  = ref.savings;
+    const monthEntries     = ref.entries;
+    const monthIncome      = ref.income;
+    const monthExpenses    = ref.expenses;
+    // Savings Rate measures income-funded saving, so it uses Flow-category
+    // savings only — not net reserve movement. Otherwise a Savings → Other
+    // deposit (external money) could push the rate over 100%, and a reserve
+    // withdrawal could drive it negative.
     const monthSavingsFlow = ref.savingsFlow;
-    const monthRent     = ref.rent;
-    const monthCashFlow = monthIncome - monthSavingsFlow - monthExpenses;
+    const monthRent        = ref.rent;
+
+    // All-time spendable balance: opening balance + earned income − Flow-category
+    // savings − expenses. Uses the canonical Flow formula from calculator.js
+    // (loaded globally in index.html) so it can never drift from the Overview.
+    const available = recalculateTotals(entries).flow;
 
     // --- KPI Cards ---
     const totalSavedEl = document.getElementById('home-total-saved');
@@ -108,9 +115,9 @@ function initHome() {
     document.getElementById('home-monthly-income').textContent   = monthIncome.toFixed(2);
     document.getElementById('home-monthly-expenses').textContent = monthExpenses.toFixed(2);
 
-    const cfEl = document.getElementById('home-cash-flow');
-    cfEl.textContent = monthCashFlow.toFixed(2);
-    cfEl.classList.toggle('home-card__value--negative', monthCashFlow < 0);
+    const availEl = document.getElementById('home-available');
+    availEl.textContent = available.toFixed(2);
+    availEl.classList.toggle('home-card__value--negative', available < 0);
 
     // --- Recent Transactions ---
     const txList = document.getElementById('home-tx-list');
@@ -161,7 +168,7 @@ function initHome() {
         fillEl.dataset.status = status;
     }
 
-    setBar('home-savings-rate-fill',  'home-savings-rate-val',  monthIncome > 0 ? monthSavings / monthIncome  : 0, 0.20, true);
+    setBar('home-savings-rate-fill',  'home-savings-rate-val',  monthIncome > 0 ? monthSavingsFlow / monthIncome : 0, 0.20, true);
     setBar('home-expense-ratio-fill', 'home-expense-ratio-val', monthIncome > 0 ? monthExpenses / monthIncome : 0, 0.80, false);
     setBar('home-rent-burden-fill',   'home-rent-burden-val',   monthIncome > 0 ? monthRent / monthIncome     : 0, 0.30, false);
 

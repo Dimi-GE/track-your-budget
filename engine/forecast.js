@@ -9,11 +9,19 @@ function buildForecast(entries, startMonth, startYear) {
     entries.forEach(e => {
         if (!e.date || !e.type || !TYPES.includes(e.type)) return;
         const key = e.date.slice(0, 7);
-        if (!byMonth[key]) byMonth[key] = { income: 0, expenses: 0, savings: 0 };
+        if (!byMonth[key]) byMonth[key] = { income: 0, expenses: 0, savings: 0, savingsFlow: 0 };
         // A "Savings" expense is a reserve withdrawal: net it out of savings
         // rather than counting it as an expense.
         if (isSavingsWithdrawal(e)) byMonth[key].savings -= e.amount;
-        else byMonth[key][e.type] += e.amount;
+        // Opening balance is not earned income — keep it out of the income
+        // series so it never inflates the weighted-average projection.
+        else if (isOpeningBalance(e)) { /* excluded from all forecast series */ }
+        else {
+            byMonth[key][e.type] += e.amount;
+            // Only Flow-category savings comes out of spendable cash, so only it
+            // reduces cash flow. Other/withdrawal savings leave cash flow alone.
+            if (e.type === 'savings' && e.category === 'flow') byMonth[key].savingsFlow += e.amount;
+        }
     });
 
     const now = new Date();
@@ -23,15 +31,18 @@ function buildForecast(entries, startMonth, startYear) {
         .filter(k => k <= currentKey)
         .sort();
 
-    const weightedAvg = { income: 0, expenses: 0, savings: 0 };
+    // Cash flow only subtracts Flow-category savings, so savingsFlow is
+    // projected alongside the three entry types.
+    const AVG_KEYS = ['income', 'expenses', 'savings', 'savingsFlow'];
+    const weightedAvg = { income: 0, expenses: 0, savings: 0, savingsFlow: 0 };
     if (historicalKeys.length > 0) {
         let totalWeight = 0;
         historicalKeys.forEach((key, i) => {
             const w = i + 1;
             totalWeight += w;
-            TYPES.forEach(t => { weightedAvg[t] += (byMonth[key][t] || 0) * w; });
+            AVG_KEYS.forEach(t => { weightedAvg[t] += (byMonth[key][t] || 0) * w; });
         });
-        TYPES.forEach(t => { weightedAvg[t] /= totalWeight; });
+        AVG_KEYS.forEach(t => { weightedAvg[t] /= totalWeight; });
     }
 
     const months = [];
@@ -41,28 +52,33 @@ function buildForecast(entries, startMonth, startYear) {
         const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
         const actual = byMonth[key];
 
-        let status, income, expenses, savings;
+        let status, income, expenses, savings, savingsFlow;
         if (key < currentKey) {
-            status   = 'actual';
-            income   = actual ? actual.income   : 0;
-            expenses = actual ? actual.expenses : 0;
-            savings  = actual ? actual.savings  : 0;
+            status      = 'actual';
+            income      = actual ? actual.income      : 0;
+            expenses    = actual ? actual.expenses    : 0;
+            savings     = actual ? actual.savings     : 0;
+            savingsFlow = actual ? actual.savingsFlow : 0;
         } else if (key === currentKey) {
-            status   = 'partial';
-            income   = actual ? actual.income   : 0;
-            expenses = actual ? actual.expenses : 0;
-            savings  = actual ? actual.savings  : 0;
+            status      = 'partial';
+            income      = actual ? actual.income      : 0;
+            expenses    = actual ? actual.expenses    : 0;
+            savings     = actual ? actual.savings     : 0;
+            savingsFlow = actual ? actual.savingsFlow : 0;
         } else {
-            status   = 'projected';
-            income   = weightedAvg.income;
-            expenses = weightedAvg.expenses;
-            savings  = weightedAvg.savings;
+            status      = 'projected';
+            income      = weightedAvg.income;
+            expenses    = weightedAvg.expenses;
+            savings     = weightedAvg.savings;
+            savingsFlow = weightedAvg.savingsFlow;
         }
 
         months.push({
             key, label, status,
             income, expenses, savings,
-            cashflow: income - expenses - savings,
+            // `savings` is net reserve movement (display line); cash flow only
+            // nets out Flow-category savings, matching calculator.js / Overview.
+            cashflow: income - expenses - savingsFlow,
         });
     }
 

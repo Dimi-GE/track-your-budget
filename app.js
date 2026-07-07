@@ -35,6 +35,18 @@ function isSavingsWithdrawal(entry) {
     return entry.type === 'expenses' && entry.category === 'savings';
 }
 
+// Starting Funds is the opening balance — money you had before tracking began.
+// It is stored as an income entry (category 'starting_funds') so the form flow
+// stays unchanged, but it is NOT earned income: counting it would spike every
+// income aggregation (forecast weighted-average, earnings heatmap, trends).
+// So every income aggregation routes through this helper to exclude it, and it
+// is folded into Flow via a separate `funds` bucket instead. See calculator.js.
+// NOTE: this is coupled to the category slug 'starting_funds' — if that slug is
+// ever renamed, update here too.
+function isOpeningBalance(entry) {
+    return entry.type === 'income' && entry.category === 'starting_funds';
+}
+
 // ── Currency configuration ───────────────────────────────────────────────
 // The list of tracked currencies and which one is "regional" (the default
 // applied to every transaction that isn't an explicit foreign holding). Kept

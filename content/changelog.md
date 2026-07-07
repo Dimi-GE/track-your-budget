@@ -1,3 +1,13 @@
+## v0.0.2b.1 — July 2026
+
+- `improvement` Starting Funds no longer counts as income: the opening balance is folded into a separate `funds` bucket that still feeds Flow (so the Flow figure is unchanged), but is excluded from the income total, Home's Monthly Income, and every income analytic — forecast weighted-average, earnings heatmap, and the Trends income line — so a one-time opening sum no longer spikes projections or crushes the heatmap's relative scale; `isOpeningBalance()` helper added to app.js so the rule is defined once
+- `fix` Cash flow now consistently subtracts only Flow-category savings across Trends and Forecasting, matching the Home rule; a Savings → Other deposit (reserve money from outside the Flow) no longer drags the cash-flow line down, while the Savings line still shows net reserve movement
+- `improvement` Dashboard — the Overview card row (Income / Savings / Total Expenses / Flow) is removed; those insights now live on Home, leaving the Dashboard focused on entry, the expense breakdown, and the transaction record. The core `recalculateTotals()` is now loaded globally (index.html) so any view shares the one canonical Flow formula
+- `improvement` Home — the monthly "Cash Flow" card is replaced by **Available**, the all-time spendable balance (opening balance + earned income − Flow-category savings − expenses); it reads as a running pool of liquid money and pairs with Total Saved as the two all-time balances
+- `fix` Home Financial Health — Savings Rate now uses income-funded (Flow-category) savings instead of net reserve movement, so a Savings → Other deposit can no longer push it over 100% and a withdrawal can no longer drive it negative; all three ratios are computed against earned income (Starting Funds excluded), so a reference month that holds the opening balance reports true income-relative ratios
+- `improvement` Analytics — Trends re-framed as a 12-month budget-year chart with its own start-month/year picker (saved across sessions), replacing the Week/Month/Quarter toggle anchored to today; it now shares Forecasting's `buildForecast()` engine (actuals only — future months are left off instead of projected), so the two charts can never drift. Trends keeps a picker independent of Forecasting's
+- `docs` DASHBOARD.md, HOME.md, ANALYTICS.md, and roadmap.md updated for the Starting Funds / income split, the Available card, the removed Dashboard Overview, the Flow-only cash-flow rule, the Savings Rate change, and the re-framed Trends
+
 ## v0.0.2b.0 — July 2026
 
 - `feature` Dashboard — multi-currency (visual): each entry carries a currency, chosen between Category and Note; it defaults to and locks on the regional currency, unlocking only for a Savings → Other entry (reserve money from outside the Flow)

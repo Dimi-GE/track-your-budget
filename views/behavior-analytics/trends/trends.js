@@ -1,20 +1,29 @@
 function initTrends() {
-    const STORAGE_KEY = 'dashboard_committed';
-    let granularity = 'month';
+    const STORAGE_KEY  = 'dashboard_committed';
+    const SETTINGS_KEY = 'trends_settings';
+    const MONTH_NAMES  = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+
     let chart = null;
+    const canvas      = document.getElementById('trends-chart');
+    const ctx         = canvas.getContext('2d');
+    const monthSelect = document.getElementById('trends-month-select');
+    const yearSelect  = document.getElementById('trends-year-select');
 
-    const canvas = document.getElementById('trends-chart');
-    const ctx    = canvas.getContext('2d');
-    const btns   = document.querySelectorAll('.granularity-btn');
-
-    btns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.dataset.g === granularity) return;
-            granularity = btn.dataset.g;
-            btns.forEach(b => b.classList.toggle('active', b.dataset.g === granularity));
-            render();
-        });
+    MONTH_NAMES.forEach((name, i) => {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.textContent = name;
+        monthSelect.appendChild(opt);
     });
+
+    const now = new Date();
+    for (let y = now.getFullYear() - 4; y <= now.getFullYear(); y++) {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+    }
 
     function getEntries() {
         try {
@@ -23,80 +32,48 @@ function initTrends() {
         } catch (_) { return []; }
     }
 
-    function weekStart(date) {
-        const d = new Date(date);
-        d.setDate(d.getDate() - (d.getDay() + 6) % 7);
-        d.setHours(0, 0, 0, 0);
-        return d;
+    function loadSettings() {
+        try {
+            const raw = localStorage.getItem(SETTINGS_KEY);
+            if (raw) return JSON.parse(raw);
+        } catch (_) {}
+        return null;
     }
 
-    function buildPeriods() {
-        const now = new Date();
-
-        if (granularity === 'month') {
-            return Array.from({ length: 12 }, (_, i) => {
-                const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
-                return {
-                    label: d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
-                    start: new Date(d.getFullYear(), d.getMonth(), 1),
-                    end:   new Date(d.getFullYear(), d.getMonth() + 1, 0),
-                };
-            });
-        }
-
-        if (granularity === 'quarter') {
-            const cq = Math.floor(now.getMonth() / 3);
-            return Array.from({ length: 8 }, (_, i) => {
-                let q = cq - (7 - i);
-                let y = now.getFullYear();
-                while (q < 0) { q += 4; y--; }
-                return {
-                    label: `Q${q + 1} '${String(y).slice(2)}`,
-                    start: new Date(y, q * 3, 1),
-                    end:   new Date(y, q * 3 + 3, 0),
-                };
-            });
-        }
-
-        // week
-        const ws = weekStart(now);
-        return Array.from({ length: 16 }, (_, i) => {
-            const start = new Date(ws);
-            start.setDate(start.getDate() - (15 - i) * 7);
-            const end = new Date(start);
-            end.setDate(end.getDate() + 6);
-            return {
-                label: start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                start,
-                end,
-            };
-        });
+    function saveSettings(month, year) {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify({ month, year }));
     }
 
-    function aggregate() {
-        const entries = getEntries();
-        const periods = buildPeriods();
-        const income = [], expenses = [], savings = [], cashflow = [];
+    // Default to the earliest month that has data — where meaningful tracking
+    // began. Mirrors Forecasting's default, but Trends keeps its own setting.
+    function defaultStart(entries) {
+        const keys = entries
+            .filter(e => e.date)
+            .map(e => e.date.slice(0, 7))
+            .sort();
+        if (keys.length > 0) {
+            const parts = keys[0].split('-').map(Number);
+            return { month: parts[1] - 1, year: parts[0] };
+        }
+        return { month: now.getMonth(), year: now.getFullYear() };
+    }
 
-        periods.forEach(p => {
-            const inRange = entries.filter(e => {
-                if (!e.date) return false;
-                const d = new Date(e.date + 'T00:00:00');
-                return d >= p.start && d <= p.end;
-            });
-            const inc = inRange.filter(e => e.type === 'income').reduce((s, e) => s + e.amount, 0);
-            const exp = inRange.filter(e => e.type === 'expenses' && !isSavingsWithdrawal(e)).reduce((s, e) => s + e.amount, 0);
-            // Savings is net of reserve withdrawals (Expenses / category 'savings').
-            const sav = inRange.reduce((s, e) =>
-                e.type === 'savings'   ? s + e.amount :
-                isSavingsWithdrawal(e) ? s - e.amount : s, 0);
-            income.push(inc);
-            expenses.push(exp);
-            savings.push(sav);
-            cashflow.push(inc - exp - sav);
+    // Trends is the historical (actuals-only) twin of Forecasting: it shares the
+    // same 12-month budget-year engine (buildForecast) so the two can never
+    // drift, but drops the projected future months to null — the lines simply
+    // end at the current month instead of extending with a projection.
+    function aggregate(month, year) {
+        const { months } = buildForecast(getEntries(), month, year);
+        const labels = [], income = [], expenses = [], savings = [], cashflow = [];
+        months.forEach(m => {
+            const actual = m.status !== 'projected';
+            labels.push(m.label);
+            income.push(actual   ? m.income   : null);
+            expenses.push(actual ? m.expenses : null);
+            savings.push(actual  ? m.savings  : null);
+            cashflow.push(actual ? m.cashflow : null);
         });
-
-        return { labels: periods.map(p => p.label), income, expenses, savings, cashflow };
+        return { labels, income, expenses, savings, cashflow };
     }
 
     function makeDataset(label, values, color, dashed) {
@@ -115,7 +92,11 @@ function initTrends() {
     }
 
     function render() {
-        const agg = aggregate();
+        const month = parseInt(monthSelect.value);
+        const year  = parseInt(yearSelect.value);
+        saveSettings(month, year);
+
+        const agg = aggregate(month, year);
         const datasets = [
             makeDataset('Income',    agg.income,   '#7bc67e', false),
             makeDataset('Expenses',  agg.expenses, '#e05c5c', false),
@@ -177,6 +158,18 @@ function initTrends() {
         });
     }
 
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js')
-        .then(render);
+    monthSelect.addEventListener('change', render);
+    yearSelect.addEventListener('change', render);
+
+    // Trends shares Forecasting's engine, so it needs forecast.js too. loadScript
+    // dedupes by src, so both components requesting it is harmless.
+    Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'),
+        loadScript('engine/forecast.js'),
+    ]).then(() => {
+        const settings = loadSettings() || defaultStart(getEntries());
+        monthSelect.value = settings.month;
+        yearSelect.value  = settings.year;
+        render();
+    });
 }

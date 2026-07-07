@@ -22,6 +22,8 @@ The entry form is where all financial data originates. Every record in the app s
 
 **Starting Funds** is a special income category. It can only be added once and represents the opening balance before any income or expenses are tracked. Once set, it disappears from the category list.
 
+Although it is entered through the Income type, Starting Funds is **not treated as earned income**. It is the opening balance, so counting it as income would spike every income analytic (forecast projection, earnings heatmap, trends) with a one-time sum that no future month will match. Instead it is folded into a separate opening-balance bucket that still contributes to **Flow** (the money is genuinely available), but is **excluded from the Overview Income card and all income analytics**. It still appears in the transaction list.
+
 **Savings** is a special *expense* category representing a **withdrawal from the reserve** — money taken out of savings in a critical situation (think of it as pulling cash off a savings/credit card). It is not consumption of income, so it behaves differently from every other expense category:
 - It **reduces the Savings total** (net reserve balance = deposits − withdrawals) rather than adding to Total Expenses.
 - It **does not affect Flow**, since the money comes from the reserve, not from income cash flow.
@@ -37,20 +39,9 @@ It still appears in the transaction list (as an outflow) so the withdrawal is on
 
 Entries added via the form go into a staging area before they are committed. This is intentional — it lets you prepare a batch of entries (for example, an entire month of backfilled data) and review them before they affect any numbers.
 
-Each staged entry shows date, amount, type, and category. Individual entries can be deleted from staging before committing. The **Apply** button commits all staged entries at once and updates every view in the app immediately. Until Apply is pressed, the Overview cards and all analytics remain unchanged.
+Each staged entry shows date, amount, type, and category. Individual entries can be deleted from staging before committing. The **Apply** button commits all staged entries at once and updates every view in the app immediately. Until Apply is pressed, all analytics remain unchanged.
 
----
-
-### Overview
-
-Four cards showing cumulative totals across the entire committed dataset (no period filter — these are all-time sums):
-
-- **Income** — total of all income entries, including Starting Funds.
-- **Savings** — net reserve balance: total of all savings entries minus any *Savings* withdrawals (Expenses type, Savings category). Shown as an **approximate total converted into the regional currency** (prefixed `≈`), since savings may hold foreign currencies via *Savings → Other*. Rates are managed in Settings → Exchange Rates.
-- **Total Expenses** — sum of all expense entries across all categories.
-- **Flow** — the net result: `Income − Savings (Flow type only) − Expenses`. This is what you actually have available after obligations are met. The Flow card is visually highlighted as it's the single most important number on the dashboard.
-
-The distinction between Savings and Flow in the Flow formula is intentional: only savings categorised as *Flow* are deducted (money moved out of free cash), while savings categorised as *Other* are treated differently — the assumption being that "Other" savings may not directly reduce liquid funds in the same accounting period.
+The Dashboard no longer carries an Overview card row — the at-a-glance totals live on the **Home** view (Total Saved, Monthly Income, Monthly Expenses, and **Available** — the all-time spendable balance that was previously the Dashboard's "Flow" card). The Dashboard is focused on entry, the expense breakdown, and the transaction record.
 
 ---
 

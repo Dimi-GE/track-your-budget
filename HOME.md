@@ -9,13 +9,13 @@ The Home view is the landing page of the app. It gives an at-a-glance picture of
 Four cards at the top summarise the most important numbers at a glance.
 
 - **Total Saved** — all-time net reserve balance: cumulative savings across every category and period, minus any *Savings* withdrawals (Expenses type, Savings category). This is the running total from the first entry to the most recent, not scoped to any month. Because savings can sit in foreign currencies (via *Savings → Other*), this figure is an **approximate total converted into the regional currency** and is prefixed with `≈`. Conversion uses the exchange rates managed in Settings (live rates with optional manual overrides); currencies without a known rate are counted at face value.
-- **Monthly Income** — income recorded in the reference month (see below).
+- **Monthly Income** — *earned* income recorded in the reference month (see below). Starting Funds (the opening balance) is excluded, so a month containing only an opening balance does not register as having income.
 - **Monthly Expenses** — total expenses recorded in the reference month.
-- **Cash Flow** — the net result for the reference month: `Income − Savings (Flow type only) − Expenses`. Turns red when negative.
+- **Available** — the all-time spendable balance: `Opening Balance + Income − Savings (Flow type only) − Expenses`. This is your running pool of liquid money — the opening balance and all earned income, less whatever you moved into the reserve (Savings → Flow) and everything you spent. Reserve withdrawals and *Savings → Other* deposits do not affect it. It is the same figure the Dashboard used to show as "Flow", computed from the shared `recalculateTotals()`. Turns red when negative. Unlike the two monthly cards beside it, this is an all-time balance (like Total Saved).
 
 ### Reference Month
 
-The KPI row and the Financial Health panel both operate against a single reference month rather than the current calendar month unconditionally. The reference month is the current month if it has any income recorded. If it does not — for example, at the start of a new month before any entries have been made — the view walks back up to 12 months to find the most recent month that does have income and uses that instead.
+The Monthly Income and Monthly Expenses cards and the Financial Health panel operate against a single reference month rather than the current calendar month unconditionally. (Total Saved and Available are all-time balances and ignore the reference month.) The reference month is the current month if it has any *earned* income recorded (Starting Funds does not count). If it does not — for example, at the start of a new month before any entries have been made — the view walks back up to 12 months to find the most recent month that does have income and uses that instead.
 
 This prevents the cards from showing zeros at the start of a new month when the previous month's data is the meaningful context. The Financial Health panel always shows which month is being used.
 
@@ -51,7 +51,7 @@ This panel always uses the current calendar month, regardless of which reference
 
 Three ratio bars measuring the reference month's numbers against common financial health thresholds. Each bar fills relative to its ceiling or target, and is colour-coded by status.
 
-**Savings Rate** — savings as a percentage of income. Target: ≥ 20%. Green at or above target, amber between 10–20%, red below 10%.
+**Savings Rate** — income-funded savings (Flow-category only) as a percentage of income. *Savings → Other* deposits (external money entering the reserve) and reserve withdrawals are deliberately excluded, so the rate reflects how much of your income you set aside and cannot exceed 100% or go negative. Target: ≥ 20%. Green at or above target, amber between 10–20%, red below 10%.
 
 **Expense Ratio** — total expenses as a percentage of income. Ceiling: 80%. Green when comfortably below (under ~68%), amber when approaching, red at or above the ceiling.
 

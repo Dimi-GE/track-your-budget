@@ -69,7 +69,6 @@ function initDashboard() {
                 committed = JSON.parse(raw);
                 startingFundsLocked = committed.entries.some(e => e.category === 'starting_funds');
                 populateCategories();
-                updateCards();
                 renderTxList(committed.entries);
             }
         } catch(e) { console.warn('Could not load:', e); }
@@ -209,7 +208,6 @@ function initDashboard() {
         committed = recalculateTotals(entries);
         startingFundsLocked = committed.entries.some(e => e.category === 'starting_funds');
         populateCategories();
-        updateCards();
         renderTxList(committed.entries);
         renderExpensesChart(committed.entries);
         saveToStorage();
@@ -378,22 +376,6 @@ function initDashboard() {
         GistSync.push({ committed, currency: getCurrencyConfig() }, date)
             .then(() => console.log('[gist] pushed at', date))
             .catch(e => console.warn('[gist] push failed:', e.message));
-    }
-
-    // --- Cards ---
-    function updateCards() {
-        document.getElementById('display-income').textContent   = committed.income.toFixed(2);
-        document.getElementById('display-expenses').textContent = committed.expenses.toFixed(2);
-        document.getElementById('display-flow').textContent     = committed.flow.toFixed(2);
-        // Savings may hold foreign currencies (Savings → Other): show an
-        // approximate total converted into the regional currency.
-        const savingsEl = document.getElementById('display-savings');
-        if (window.FxRates) {
-            savingsEl.textContent = '≈ ' + FxRates.netSavingsRegional(committed.entries).toFixed(2);
-            savingsEl.title = 'Approximate total in ' + getRegionalCurrency();
-        } else {
-            savingsEl.textContent = committed.savings.toFixed(2);
-        }
     }
 
     // --- Export ---

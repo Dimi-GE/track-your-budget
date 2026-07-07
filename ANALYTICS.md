@@ -18,6 +18,8 @@ Each cell represents one calendar day. The colour intensity of a cell reflects h
 
 This relative scale is intentional. Using absolute thresholds would cause high fixed costs (e.g. rent) to dominate at the top level every month, compressing all other activity into the lower levels. With quartile scaling, you see meaningful variation across the full range of your spending or earning behaviour.
 
+Starting Funds (the opening balance) is excluded from the Earnings heatmap for the same reason — a one-time opening sum would otherwise peg its day at the top level and crush every real earning day down the relative scale.
+
 **Year picker** — a slot-machine style selector showing the selected year in context. Click adjacent years to navigate. Future years are shown as inactive.
 
 **Quarter buttons (Q1–Q4)** — switch between quarters within the selected year. Future quarters within the current year are disabled.
@@ -28,18 +30,17 @@ This relative scale is intentional. Using absolute thresholds would cause high f
 
 ## Trends
 
-A line chart showing income, expenses, savings, and cash flow over time, using committed data going back from the current date.
+A 12-month line chart showing income, expenses, savings, and cash flow across a chosen budget year — the historical (actuals-only) counterpart to Forecasting.
 
 Four lines are plotted:
-- **Income** — green
+- **Income** — green (Starting Funds excluded — it is not earned income)
 - **Expenses** — red
-- **Savings** — blue
+- **Savings** — blue (net reserve movement: deposits minus withdrawals)
 - **Cash Flow** — amber, dashed (income minus savings of Flow type minus expenses)
 
-**Granularity** — three modes selectable via the toggle at the top:
-- *Week* — the most recent 16 weeks
-- *Month* — the most recent 12 months (default)
-- *Quarter* — the most recent 8 quarters
+**Budget Year** — a start month and year are selected via the picker at the top, and the chart covers exactly 12 months from that point. The selection is saved and restored across sessions, and defaults to the earliest month that has committed data. This picker is **independent of Forecasting's** — the two sections keep their own budget-year settings, so you can view different windows in each at once.
+
+Trends and Forecasting share the same underlying 12-month engine, so their numbers can never disagree. The difference is that Trends plots only recorded months: past and current-month values are drawn, and any months in the window that lie in the future are simply left off (the lines end at the current month) rather than being projected. For the forward projection, see Forecasting below.
 
 Hovering any point shows all four values for that period in a shared tooltip. The chart uses a shared index interaction, so the tooltip tracks across all lines simultaneously.
 
@@ -57,7 +58,7 @@ The picker defaults to the earliest month that has committed data, on the assump
 
 ### How the Projection Works
 
-All committed months up to and including the current month are used to compute a weighted average per entry type (income, expenses, savings). The weighting is linear — the most recent month has the highest weight, the oldest has the lowest. This means gradual changes in behaviour (a salary increase, a new recurring expense) naturally pull the projection forward rather than being diluted by older data.
+All committed months up to and including the current month are used to compute a weighted average per entry type (income, expenses, savings). Starting Funds (the opening balance) is excluded from every series, so a one-time opening sum never inflates the projection. Cash flow subtracts only Flow-category savings, so a *Savings → Other* deposit does not depress it. The weighting is linear — the most recent month has the highest weight, the oldest has the lowest. This means gradual changes in behaviour (a salary increase, a new recurring expense) naturally pull the projection forward rather than being diluted by older data.
 
 Each month in the 12-month window is assigned one of three statuses:
 

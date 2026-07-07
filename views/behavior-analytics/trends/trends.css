@@ -9,32 +9,34 @@
     align-items: center;
 }
 
-.trends-granularity {
+.trends-picker {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 8px;
     background: var(--app-bg);
     border: 1px solid var(--card-border);
     border-radius: 6px;
-    padding: 3px;
+    padding: 5px 10px;
 }
 
-.granularity-btn {
-    padding: 4px 12px;
+.trends-picker-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.trends-select {
     background: transparent;
     border: none;
-    border-radius: 4px;
-    color: var(--text-muted);
+    color: var(--text-primary);
     font-size: 12px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    outline: none;
+    padding: 2px 4px;
 }
 
-.granularity-btn:hover:not(.active) {
-    color: var(--text-primary);
-}
-
-.granularity-btn.active {
-    background: var(--card-border);
+.trends-select option {
+    background: var(--surface);
     color: var(--text-primary);
 }
 

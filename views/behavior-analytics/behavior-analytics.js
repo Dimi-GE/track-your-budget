@@ -25,7 +25,13 @@ function initBehaviorAnalytics() {
         });
     }
 
-    loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js').then(() => {
+    // Preload shared deps (Chart.js + the forecast engine used by both Trends and
+    // Forecasting) before any component inits, so component-level loadScript calls
+    // dedupe against an already-executed script rather than racing each other.
+    Promise.all([
+        loadScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js'),
+        loadScript('engine/forecast.js'),
+    ]).then(() => {
         Promise.all([
             loadComponent(document.getElementById('spending-heatmap-slot'), 'spending-heatmap'),
             loadComponent(document.getElementById('earnings-heatmap-slot'), 'earnings-heatmap'),
