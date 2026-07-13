@@ -23,7 +23,7 @@ const GistBackup = (() => {
     // App-data keys included in a full snapshot (same set as Settings' local
     // "Backup All Data" action). Credential keys are intentionally excluded.
     const KEYS = ['dashboard_committed', 'currency_config', 'currency_rates',
-                  'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
+                  'forecast_settings'];
 
     // ── Config ───────────────────────────────────────────────────────────
     function getConfig() {

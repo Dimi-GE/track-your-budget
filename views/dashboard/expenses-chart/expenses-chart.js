@@ -1,17 +1,4 @@
-const EXPENSE_CATEGORIES = [
-    { key: 'groceries',        label: 'Groceries',       icon: 'ti-shopping-cart',  color: '#4caf7d' },
-    { key: 'deliveries',       label: 'Deliveries',      icon: 'ti-bike',           color: '#f5a800' },
-    { key: 'pets',             label: 'Pets',            icon: 'ti-paw',            color: '#e05c5c' },
-    { key: 'medical',          label: 'Medical',         icon: 'ti-heart-plus',     color: '#e57373' },
-    { key: 'media',    label: 'Media',   icon: 'ti-device-tv',      color: '#ba68c8' },
-    { key: 'subscriptions',    label: 'Subscriptions',   icon: 'ti-repeat',         color: '#4fc3f7' },
-    { key: 'rent',             label: 'Rent',            icon: 'ti-home',           color: '#ff8a65' },
-    { key: 'online',           label: 'Online',          icon: 'ti-package',        color: '#a1887f' },
-    { key: 'shopping',         label: 'Shopping',        icon: 'ti-shopping-bag',   color: '#f06292' },
-    { key: 'gifts',            label: 'Gifts',           icon: 'ti-gift',           color: '#ce93d8' },
-    { key: 'transport',        label: 'Transport',       icon: 'ti-car',            color: '#80cbc4' },
-    { key: 'personal',         label: 'Personal',        icon: 'ti-user',           color: '#fff176' },
-];
+// EXPENSE_CATEGORIES is the shared definition from app.js (loaded globally).
 
 let expensesChartInstance = null;
 let currentEntries = [];
@@ -270,21 +257,27 @@ function renderExpensesChart(entries) {
     });
 }
 
-// Map icon names to Tabler unicode codepoints
+// Resolve a Tabler icon class to its glyph codepoint by reading the loaded
+// webfont's own CSS (`.ti-xxx::before { content: "\eXXX" }`), so the canvas
+// draws the same glyph the CSS `<i class="ti ...">` elements do. This works for
+// any valid icon without a hand-maintained codepoint table; unknown classes
+// resolve to '?' (0x003F). Results are cached — one probe per distinct icon.
+const _tablerCodepointCache = {};
 function getTablerCodepoint(iconClass) {
-    const map = {
-        'ti-shopping-cart': 0xEB25,
-        'ti-bike':          0xEA36,
-        'ti-paw':           0xEFF9,
-        'ti-heart-plus':    0xF142,
-        'ti-device-tv':     0xEA8D,
-        'ti-repeat':        0xEB72,
-        'ti-home':          0xEAC1,
-        'ti-package':       0xEAFF,
-        'ti-shopping-bag':  0xF5F8,
-        'ti-gift':          0xEB68,
-        'ti-car':           0xEBBB,
-        'ti-user':          0xEB4D,
-    };
-    return map[iconClass] || 0x003F;
+    if (iconClass in _tablerCodepointCache) return _tablerCodepointCache[iconClass];
+
+    let cp = 0x003F;
+    const probe = document.createElement('i');
+    probe.className = 'ti ' + iconClass;
+    probe.style.cssText = 'position:absolute;left:-9999px;visibility:hidden;';
+    document.body.appendChild(probe);
+    const content = getComputedStyle(probe, '::before').content;
+    probe.remove();
+
+    if (content && content !== 'none' && content !== 'normal') {
+        const glyph = content.replace(/^["']|["']$/g, '');
+        if (glyph) cp = glyph.codePointAt(0);
+    }
+    _tablerCodepointCache[iconClass] = cp;
+    return cp;
 }

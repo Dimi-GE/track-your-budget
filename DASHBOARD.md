@@ -11,11 +11,12 @@ The entry form is where all financial data originates. Every record in the app s
 **Fields:**
 - **Date** — defaults to today, can be set to any past date. This allows backfilling historical data (e.g. from a banking app) without being tied to when you're actually sitting at the app.
 - **Amount** — numeric, no currency symbol.
-- **Type** — three options: Income, Savings, Expenses. The type selection drives what categories are available.
+- **Type** — four options: Income, Savings, Expenses, Potential. The type selection drives what categories are available.
 - **Category** — changes depending on type:
   - *Income:* Starting Funds, Salary, Other
   - *Savings:* Flow, Other
-  - *Expenses:* Groceries, Deliveries, Pets, Medical, Media, Subscriptions, Rent, Online, Shopping, Gifts, Transport, Personal, Savings
+  - *Expenses:* Groceries, Deliveries, Pets, Medical, Household, Subscriptions, Rent, Gaming, Shopping, Gifts, Transport, Personal, Savings
+  - *Potential:* Income, Expenses
 - **Currency** — sits between Category and Note. Defaults to the regional currency (set in Settings) and is **locked** for every entry, with one exception: a *Savings → Other* entry — money entering the reserve from outside the Flow — unlocks the selector so a foreign currency can be chosen. This is a visual attribute only in this phase; no conversion or cross-currency math is performed.
 - **Holding** — shown only when the type is *Savings*. Records where the money sits (Cash, Card, Bank, Other). Used to group the Home Savings Holdings sheet.
 - **Note** — optional free-text field, visible in the transaction list.
@@ -30,6 +31,13 @@ Although it is entered through the Income type, Starting Funds is **not treated 
 - It is **excluded from all expense analytics** — the Expenses by Category chart, the Home expense breakdown and spending trend, and the Behavior Analytics trends/heatmap/forecast — which stay focused on income-funded spending.
 
 It still appears in the transaction list (as an outflow) so the withdrawal is on record.
+
+**Potential** is a separate *type* for a partner's money — funds that are "potentially" available to the household but that you don't control on a daily basis, only reconcile once a month (a partner's earnings and spending). It is deliberately isolated from every controlled total and analytic:
+- Its two categories, **Income** and **Expenses**, record only the direction of each entry. The net of the two (income − expenses) accumulates into a single **growing potential pool**.
+- It **never touches Flow / Available**, the Monthly Income or Monthly Expenses cards, or any Behavior Analytics view (trends, heatmaps, forecast) — those all operate on the Income/Savings/Expenses types and ignore Potential entirely.
+- It surfaces in exactly one place: as a sub-value under the Home **Available** card (see HOME.md), where it is added to Available to show the couple's combined pool.
+
+Like every other type it appears in the transaction list (tagged *potential*), and currency is locked to the regional currency.
 
 **Backup (file operations)** — accessible via the file icon button, this panel slides open with three controls: a filename field, Export, and Import. Export saves the entire dataset as a `.json` file. Import replaces the current dataset with a file. Both operate on the full history, not a specific period.
 

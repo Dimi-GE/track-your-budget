@@ -3,20 +3,9 @@ let homeDonutChart = null;
 function initHome() {
     const STORAGE_KEY = 'dashboard_committed';
 
-    const EXPENSE_CATS = [
-        { key: 'groceries',     label: 'Groceries',     color: '#4caf7d' },
-        { key: 'deliveries',    label: 'Deliveries',    color: '#f5a800' },
-        { key: 'pets',          label: 'Pets',          color: '#e05c5c' },
-        { key: 'medical',       label: 'Medical',       color: '#e57373' },
-        { key: 'media',         label: 'Media',         color: '#ba68c8' },
-        { key: 'subscriptions', label: 'Subscriptions', color: '#4fc3f7' },
-        { key: 'rent',          label: 'Rent',          color: '#ff8a65' },
-        { key: 'online',        label: 'Online',        color: '#a1887f' },
-        { key: 'shopping',      label: 'Shopping',      color: '#f06292' },
-        { key: 'gifts',         label: 'Gifts',         color: '#ce93d8' },
-        { key: 'transport',     label: 'Transport',     color: '#80cbc4' },
-        { key: 'personal',      label: 'Personal',      color: '#fff176' },
-    ];
+    // Shared category definition from app.js (loaded globally). The donut only
+    // needs key/label/colour; the icon field is simply unused here.
+    const EXPENSE_CATS = EXPENSE_CATEGORIES;
 
     // --- Load committed entries ---
     let entries = [];
@@ -106,7 +95,11 @@ function initHome() {
     // All-time spendable balance: opening balance + earned income − Flow-category
     // savings − expenses. Uses the canonical Flow formula from calculator.js
     // (loaded globally in index.html) so it can never drift from the Overview.
-    const available = recalculateTotals(entries).flow;
+    // `potential` is the partner's growing net pool (Potential type), kept out of
+    // Flow and shown only as a sub-value here. See isPotential() / calculator.js.
+    const totals    = recalculateTotals(entries);
+    const available = totals.flow;
+    const potential = totals.potential;
 
     // --- KPI Cards ---
     const totalSavedEl = document.getElementById('home-total-saved');
@@ -118,6 +111,21 @@ function initHome() {
     const availEl = document.getElementById('home-available');
     availEl.textContent = available.toFixed(2);
     availEl.classList.toggle('home-card__value--negative', available < 0);
+
+    // Partner "Potential" sub-value. Only shown once any Potential entry exists,
+    // so the solo-user layout is unchanged. "together" is the combined pool.
+    const potentialBlock = document.getElementById('home-potential-block');
+    const hasPotential = entries.some(isPotential);
+    potentialBlock.hidden = !hasPotential;
+    if (hasPotential) {
+        const together = available + potential;
+        const potEl = document.getElementById('home-potential');
+        potEl.textContent = (potential >= 0 ? '+ ' : '− ') + Math.abs(potential).toFixed(2);
+        potEl.classList.toggle('home-card__sub--negative', potential < 0);
+        const togEl = document.getElementById('home-together');
+        togEl.textContent = together.toFixed(2);
+        togEl.classList.toggle('home-card__together--negative', together < 0);
+    }
 
     // --- Recent Transactions ---
     const txList = document.getElementById('home-tx-list');
@@ -134,10 +142,14 @@ function initHome() {
         txList.innerHTML = '<div class="home-no-data">No transactions yet</div>';
     } else {
         txList.innerHTML = recent.map(e => {
-            const sign = e.type === 'income' ? '+' : e.type === 'savings' ? '~' : '-';
+            // Potential rows carry their own direction in the category, so sign by
+            // that; income/savings are inflows, everything else is an outflow.
+            let sign;
+            if (isPotential(e)) sign = e.category === 'expenses' ? '-' : '+';
+            else sign = e.type === 'income' ? '+' : e.type === 'savings' ? '~' : '-';
             return `<div class="home-tx-item">
                 <span class="home-tx-date">${e.date}</span>
-                <span class="home-tx-cat">${e.categoryLabel}</span>
+                <span class="home-tx-cat">${e.categoryLabel}${isPotential(e) ? ' <span class="home-tx-tag">potential</span>' : ''}</span>
                 <span class="home-tx-amount home-tx-amount--${e.type}">${sign}${e.amount.toFixed(2)}</span>
             </div>`;
         }).join('');

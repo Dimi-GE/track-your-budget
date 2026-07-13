@@ -84,6 +84,55 @@
     color: #e05c5c;
 }
 
+/* Partner "Potential" sub-value under the Available card */
+.home-card__potential {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border);
+}
+
+.home-card__sub {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #7e88c9;
+}
+
+.home-card__sub i {
+    font-size: 12px;
+    align-self: center;
+}
+
+.home-card__sub--negative {
+    color: #e05c5c;
+}
+
+.home-card__together {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.home-card__together--negative {
+    color: #e05c5c;
+}
+
+.home-card__sub-label {
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
 /* Main grid */
 .home-grid {
     display: grid;
@@ -180,9 +229,22 @@
     flex-shrink: 0;
 }
 
-.home-tx-amount--income   { color: #4caf7d; }
-.home-tx-amount--savings  { color: #4caf7d; }
-.home-tx-amount--expenses { color: #e05c5c; }
+.home-tx-amount--income    { color: #4caf7d; }
+.home-tx-amount--savings   { color: #4caf7d; }
+.home-tx-amount--expenses  { color: #e05c5c; }
+.home-tx-amount--potential { color: #7e88c9; }
+
+.home-tx-tag {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #7e88c9;
+    border: 1px solid #7e88c9;
+    border-radius: 3px;
+    padding: 0 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
 
 /* Savings holdings sheet */
 .holdings-table {

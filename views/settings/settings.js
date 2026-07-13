@@ -1,5 +1,5 @@
 function initSettings() {
-    const STORAGE_KEYS = ['dashboard_committed', 'currency_config', 'currency_rates', 'forecast_settings', 'tt_entries', 'tt_sessions', 'tt_settings'];
+    const STORAGE_KEYS = ['dashboard_committed', 'currency_config', 'currency_rates', 'forecast_settings'];
 
     // ── Backup ─────────────────────────────────────────────────────────────
     document.getElementById('btn-backup').addEventListener('click', () => {

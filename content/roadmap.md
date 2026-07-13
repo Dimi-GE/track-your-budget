@@ -81,12 +81,6 @@ Sidebar hidden on touch devices. Hamburger button opens a slide-in drawer with f
 ### Settings View
 Reset All Data action with inline confirmation. Clears all localStorage keys and reloads to Home.
 
-### PDF: Hours Reports Export
-One-click hours report export.
-
-### Hours Reports View
-Shell created with calendar, timer, sessions list, and weekly bar chart. Data model and purpose to be defined.
-
 ### Roadmap View
 Structure built. Content now driven by markdown files via the engine.
 

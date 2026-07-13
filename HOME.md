@@ -13,6 +13,8 @@ Four cards at the top summarise the most important numbers at a glance.
 - **Monthly Expenses** — total expenses recorded in the reference month.
 - **Available** — the all-time spendable balance: `Opening Balance + Income − Savings (Flow type only) − Expenses`. This is your running pool of liquid money — the opening balance and all earned income, less whatever you moved into the reserve (Savings → Flow) and everything you spent. Reserve withdrawals and *Savings → Other* deposits do not affect it. It is the same figure the Dashboard used to show as "Flow", computed from the shared `recalculateTotals()`. Turns red when negative. Unlike the two monthly cards beside it, this is an all-time balance (like Total Saved).
 
+  **Potential sub-value.** When any *Potential*-type entries exist (a partner's money stream — see DASHBOARD.md), the Available card grows a two-line sub-value beneath the main figure: **potential** — the all-time net of Potential Income minus Potential Expenses, a *growing* pool you reconcile monthly rather than track daily — and **together**, the combined `Available + potential`. This mirrors the actual → projected → total presentation of the Forecasting cards. Potential money is otherwise excluded from Available and from every other card and analytic; if no Potential entries exist, the sub-value is hidden and the card looks exactly as it did for solo use.
+
 ### Reference Month
 
 The Monthly Income and Monthly Expenses cards and the Financial Health panel operate against a single reference month rather than the current calendar month unconditionally. (Total Saved and Available are all-time balances and ignore the reference month.) The reference month is the current month if it has any *earned* income recorded (Starting Funds does not count). If it does not — for example, at the start of a new month before any entries have been made — the view walks back up to 12 months to find the most recent month that does have income and uses that instead.
@@ -33,7 +35,7 @@ The currency shown on each entry comes from the Dashboard entry form; the region
 
 ## Recent Transactions
 
-The 5 most recent committed entries across all types, sorted newest first. Because entries are day-level only, entries sharing a date are ordered by commit order (most recently committed first). Each row shows the date, the category label in plain white text, and the amount with a sign prefix (`+` for income, `~` for savings, `−` for expenses). The amount is colour-coded by direction: green for money in (income and savings), red for expenses.
+The 5 most recent committed entries across all types, sorted newest first. Because entries are day-level only, entries sharing a date are ordered by commit order (most recently committed first). Each row shows the date, the category label in plain white text, and the amount with a sign prefix (`+` for income, `~` for savings, `−` for expenses). *Potential* entries are signed by their own direction (`+` for Potential Income, `−` for Potential Expenses) and carry a small *potential* tag. The amount is colour-coded by direction: green for money in (income and savings), red for expenses, indigo for potential.
 
 This is a read-only snapshot. The full transaction list with filters is in the Dashboard.
 

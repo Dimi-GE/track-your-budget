@@ -6,12 +6,13 @@ function initDashboard() {
     const categories = {
         income:   ['Starting Funds', 'Salary', 'Other'],
         savings:  ['Flow', 'Other'],
+        // Spend categories come from the shared EXPENSE_CATEGORIES (app.js); the
+        // "Savings" reserve-withdrawal category is appended as it is special.
         expenses: [
-            'Groceries', 'Deliveries', 'Pets', 'Medical',
-            'Media', 'Subscriptions', 'Rent', 'Online',
-            'Shopping', 'Gifts', 'Transport', 'Personal',
+            ...EXPENSE_CATEGORIES.map(c => c.label),
             'Savings'   // withdrawal from the reserve (nets down Savings, not an expense)
         ],
+        potential: ['Income', 'Expenses'],   // partner stream, direction only; see isPotential()
     };
 
     let committed = {
@@ -241,6 +242,7 @@ function initDashboard() {
                             <option value="income">Income</option>
                             <option value="savings">Savings</option>
                             <option value="expenses">Expenses</option>
+                            <option value="potential">Potential</option>
                         </select>
                     </label>
                     <label class="entry-editor__field"><span>Category</span><select id="edit-category"></select></label>
