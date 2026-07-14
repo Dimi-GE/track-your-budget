@@ -9,6 +9,7 @@ function initTrends() {
     const ctx         = canvas.getContext('2d');
     const monthSelect = document.getElementById('trends-month-select');
     const yearSelect  = document.getElementById('trends-year-select');
+    const curSym      = regionalCurrencySymbol();
 
     MONTH_NAMES.forEach((name, i) => {
         const opt = document.createElement('option');
@@ -135,7 +136,7 @@ function initTrends() {
                         titleColor: '#ffffff',
                         bodyColor: '#888888',
                         callbacks: {
-                            label: c => ` ${c.dataset.label}: $${c.parsed.y.toFixed(2)}`,
+                            label: c => ` ${c.dataset.label}: ${curSym}${c.parsed.y.toFixed(2)}`,
                         },
                     },
                 },
@@ -149,7 +150,7 @@ function initTrends() {
                         ticks: {
                             color: '#888',
                             font: { size: 10 },
-                            callback: v => '$' + v.toLocaleString(),
+                            callback: v => curSym + v.toLocaleString(),
                         },
                         beginAtZero: true,
                     },

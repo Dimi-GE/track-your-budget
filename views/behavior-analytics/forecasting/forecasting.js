@@ -10,6 +10,7 @@ function initForecasting() {
     const monthSelect = document.getElementById('forecast-month-select');
     const yearSelect  = document.getElementById('forecast-year-select');
     const dataLabel   = document.getElementById('forecast-data-label');
+    const curSym      = regionalCurrencySymbol();
 
     MONTH_NAMES.forEach((name, i) => {
         const opt = document.createElement('option');
@@ -59,12 +60,12 @@ function initForecasting() {
 
     function fmt(v) {
         const abs = Math.abs(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        return (v < 0 ? '-' : '') + '$' + abs;
+        return (v < 0 ? '-' : '') + curSym + abs;
     }
 
     function fmtDelta(v) {
         const abs = Math.abs(v).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-        return (v < 0 ? '-' : '+') + '$' + abs;
+        return (v < 0 ? '-' : '+') + curSym + abs;
     }
 
     function render() {
@@ -140,7 +141,7 @@ function initForecasting() {
                                     if (s === 'partial')   return '(month in progress)';
                                     return '';
                                 },
-                                label: c => ` ${c.dataset.label}: $${c.parsed.y.toFixed(2)}`,
+                                label: c => ` ${c.dataset.label}: ${curSym}${c.parsed.y.toFixed(2)}`,
                             },
                         },
                     },
@@ -154,7 +155,7 @@ function initForecasting() {
                             ticks: {
                                 color: '#888',
                                 font: { size: 10 },
-                                callback: v => '$' + v.toLocaleString(),
+                                callback: v => curSym + v.toLocaleString(),
                             },
                             beginAtZero: true,
                         },

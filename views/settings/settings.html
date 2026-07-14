@@ -4,7 +4,7 @@
         <div class="settings-card">
             <div class="settings-card-body">
                 <div class="settings-item-label">Backup All Data</div>
-                <div class="settings-item-desc">Downloads a full snapshot of all dashboard entries, time tracking records, and preferences as a single JSON file.</div>
+                <div class="settings-item-desc">Downloads a full snapshot of all dashboard entries and preferences as a single JSON file.</div>
             </div>
             <div class="settings-item-action">
                 <button class="btn-backup" id="btn-backup">Backup</button>
@@ -23,7 +23,7 @@
         <div class="settings-card">
             <div class="settings-card-body">
                 <div class="settings-item-label">Reset All Data</div>
-                <div class="settings-item-desc">Clears all financial entries, time tracking records, and saved preferences. This cannot be undone.</div>
+                <div class="settings-item-desc">Clears all financial entries and saved preferences. This cannot be undone.</div>
             </div>
             <div class="settings-item-action" id="reset-action">
                 <button class="btn-reset" id="btn-reset">Reset</button>
@@ -69,48 +69,33 @@
 
     <div class="settings-section">
         <div class="section-title">Remote Backup</div>
+
         <div class="settings-card gist-card">
             <div class="settings-card-body">
-                <div class="settings-item-label">GitHub Gist Sync</div>
-                <div class="settings-item-desc">Connect a GitHub personal access token (with <strong>gist</strong> scope) and a Gist ID to back up dashboard data to a remote JSON file. The token is stored only in this browser.</div>
+                <div class="settings-item-label">GitHub Access Token</div>
+                <div class="settings-item-desc">A GitHub personal access token with <strong>gist</strong> scope. Stored only in this browser and never written into any backup. Connect the token to unlock the backup Gist below.</div>
 
-                <div class="gist-fields">
-                    <label class="gist-field">
-                        <span class="gist-field-label">Access token</span>
-                        <input type="password" id="gist-token" class="gist-input" placeholder="ghp_… or github_pat_…" autocomplete="off" spellcheck="false">
-                    </label>
-                    <label class="gist-field">
-                        <span class="gist-field-label">Gist ID</span>
-                        <input type="text" id="gist-id" class="gist-input" placeholder="e.g. 1a2b3c4d5e6f…" autocomplete="off" spellcheck="false">
-                    </label>
+                <div class="gist-connect-row">
+                    <input type="password" id="gist-token" class="gist-input" placeholder="ghp_… or github_pat_…" autocomplete="off" spellcheck="false">
+                    <span class="gist-action-inline" id="token-action"></span>
                 </div>
 
-                <div class="gist-status" id="gist-status"></div>
-            </div>
-            <div class="settings-item-action" id="gist-action">
-                <button class="btn-backup" id="btn-gist-connect">Connect</button>
+                <div class="gist-status" id="token-status"></div>
             </div>
         </div>
 
         <div class="settings-card gist-card">
             <div class="settings-card-body">
-                <div class="settings-item-label">Full Snapshot Backup</div>
-                <div class="settings-item-desc"><strong>Connect</strong> to a dedicated GitHub Gist to keep a complete snapshot of <strong>all</strong> data — dashboard entries, currencies, time tracking, and preferences. While connected it syncs newest-wins each time you open the app, and <em>Backup</em> / <em>Restore</em> force a push / pull. Uses the same token as Gist Sync; create a <strong>separate secret Gist</strong> for this. Restore replaces all current data.</div>
+                <div class="settings-item-label">Backup Gist</div>
+                <div class="settings-item-desc">A <strong>secret</strong> GitHub Gist that stores a full snapshot of <strong>all</strong> your data — entries, currencies, rates, and preferences. Once connected, every <em>Apply</em> backs up automatically and each app open reconciles newest-wins; <em>Backup</em> / <em>Restore</em> force a push / pull. Restore replaces all current data.</div>
 
-                <div class="gist-fields">
-                    <label class="gist-field">
-                        <span class="gist-field-label">Access token</span>
-                        <input type="password" id="backup-token" class="gist-input" placeholder="ghp_… or github_pat_…" autocomplete="off" spellcheck="false">
-                    </label>
-                    <label class="gist-field">
-                        <span class="gist-field-label">Backup Gist ID</span>
-                        <input type="text" id="backup-id" class="gist-input" placeholder="e.g. 9f8e7d6c5b4a…" autocomplete="off" spellcheck="false">
-                    </label>
+                <div class="gist-connect-row">
+                    <input type="text" id="gist-id" class="gist-input" placeholder="e.g. 1a2b3c4d5e6f…" autocomplete="off" spellcheck="false">
+                    <span class="gist-action-inline" id="gist-action"></span>
                 </div>
 
-                <div class="gist-status" id="backup-status"></div>
+                <div class="gist-status" id="gist-status"></div>
             </div>
-            <div class="settings-item-action backup-actions" id="backup-action"></div>
         </div>
     </div>
 </div>

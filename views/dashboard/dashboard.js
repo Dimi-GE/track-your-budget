@@ -213,8 +213,8 @@ function initDashboard() {
         renderExpensesChart(committed.entries);
         saveToStorage();
         // Stamp local freshness on every commit, independent of any sync
-        // connection, so both Gist Sync and the full backup can compare ages.
-        window.GistSync?.markLocalModified?.();
+        // connection, so a later Connect can compare ages correctly.
+        window.GistBackup?.markLocalModified?.();
         pushToGist();
     }
     window.applyPeriodImport = applyCommitted;
@@ -371,12 +371,11 @@ function initDashboard() {
         applyCommitted([...committed.entries]);   // recalc, persist, push, re-render
     }
 
-    // --- Remote backup (push on commit if connected) ---
+    // --- Remote backup (push full snapshot on commit if connected) ---
     function pushToGist() {
-        if (!window.GistSync?.isConnected()) return;
-        const date = GistSync.getLocalMtime();
-        GistSync.push({ committed, currency: getCurrencyConfig() }, date)
-            .then(() => console.log('[gist] pushed at', date))
+        if (!window.GistBackup?.isConnected()) return;
+        GistBackup.backupNow()
+            .then(date => console.log('[gist] pushed at', date))
             .catch(e => console.warn('[gist] push failed:', e.message));
     }
 

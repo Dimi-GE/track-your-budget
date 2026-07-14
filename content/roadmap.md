@@ -1,17 +1,15 @@
 ## Planned
 
-### Settings — Extended Configuration
-Additional settings: GitHub Gist Sync, currency symbol.
-
 ### Onboarding
 Guided introduction to the app covering the data entry workflow, what Flow means, and how the analytics build on committed data.
 
 ## In Progress
 
+### Settings — Extended Configuration
+Additional settings: GitHub Gist Sync, currency symbol.
+
 ## Backlog
 
-### HackMD Integration
-Pull document content from the HackMD API. Edit docs collaboratively online, see them reflected in the app automatically without touching code.
 
 ### PDF: Financial Report Export
 One-click budget report covering a selected period: income, expenses, savings breakdown, and a forecast snapshot.
@@ -27,9 +25,6 @@ Option to split the dashboard into a seperate project, tracking X financial dash
 ### Customization
 Ability to make custom widgets/sections (board constructor?).
 
-### AI-Powered Workflow
-Ability to use agentic LLM via API key.
-
 ## Done
 
 ### Multi-currency Support (Visual)
@@ -40,7 +35,7 @@ Phase 1 — display only, no conversion or cross-currency math.
 - Settings: manage the currency list and set the regional currency.
 - Home: savings holdings sheet (Amount | Currency | Type) replacing the
   spending trend panel, grouped by currency and holding type.
-- Currency config synced through both local JSON backup and the Gist bundle.
+- Currency config synced through both the local JSON backup and the remote Gist snapshot.
 
 Base-currency conversion for savings totals is now In Progress; broader
 conversion (Flow, analytics) remains in the Backlog.
@@ -52,13 +47,15 @@ free no-key API with a per-currency manual override, cached and refreshed per
 session. Only the savings totals are converted — Flow and analytics stay
 regional for now.
 
-### Remote Full Backup
-Connectable full-snapshot backup to a dedicated GitHub Gist, separate from the
-live Dashboard sync. Connect mirrors Gist Sync (newest-wins baseline), then it
-reconciles per session on app open. Manual Backup / Restore force a push / pull
-and are available only while connected. Reuses the same token with its own Gist
-ID; backs up every data key (dashboard, currencies, time tracking, preferences).
-Credentials are never written into the snapshot.
+### Remote Backup
+Connectable full-snapshot backup to a single GitHub Gist. A verified access
+token unlocks the Gist; the two connect independently, and disconnecting the
+token cascades to clear the Gist as well. Connect establishes a newest-wins
+baseline, each app open reconciles per session, the Dashboard Apply backs up the
+whole snapshot, and manual Backup / Restore force a push / pull while connected.
+Backs up every data key (dashboard entries, currencies, rates, preferences); a
+device with no entries pulls rather than pushing, so it can never overwrite a
+Gist that already holds data. Credentials are never written into the snapshot.
 
 ### Home View
 Live KPI cards pulling from committed data. Spending trend mini-chart. Recent transactions panel. Currently a visual placeholder.

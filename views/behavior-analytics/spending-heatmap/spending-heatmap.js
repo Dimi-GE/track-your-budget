@@ -3,6 +3,8 @@ function initSpendingHeatmap() {
     const MONTHS      = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const COL_PX      = 23;
 
+    const curSym = regionalCurrencySymbol();
+
     const now = new Date();
     let year    = now.getFullYear();
     let quarter = Math.floor(now.getMonth() / 3) + 1;
@@ -102,7 +104,7 @@ function initSpendingHeatmap() {
                 const ds       = dateStr(date);
                 const amount   = totals[ds] || 0;
                 cell.dataset.level = level(amount);
-                cell.title = amount > 0 ? `${ds}  ·  $${amount.toFixed(2)}` : ds;
+                cell.title = amount > 0 ? `${ds}  ·  ${curSym}${amount.toFixed(2)}` : ds;
                 if (date.getDate() === 1) {
                     const lbl       = document.createElement('span');
                     lbl.className   = 'heatmap-month-label';

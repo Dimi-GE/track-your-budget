@@ -114,6 +114,15 @@ function getCurrencyMeta(code) {
         || { code: code || '', symbol: '', name: code || '' };
 }
 
+// Display prefix for amounts in charts/tooltips: the regional currency's symbol,
+// falling back to its code (e.g. "PLN ") when no symbol is set, so figures are
+// never rendered bare or, worse, under a hard-coded "$". Used by the Analytics
+// charts (trends, forecasting, heatmaps).
+function regionalCurrencySymbol() {
+    const meta = getCurrencyMeta(getRegionalCurrency());
+    return meta.symbol || (meta.code ? meta.code + ' ' : '');
+}
+
 function getHoldingLabel(key) {
     const h = HOLDING_TYPES.find(h => h.key === key);
     return h ? h.label : (key ? capitalize(key) : '—');
@@ -272,12 +281,8 @@ function capitalize(str) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // Pull remote backup once on open; newest copy wins before any view renders.
-    if (window.GistSync?.isConnected()) {
-        try { await GistSync.reconcileOnOpen(); }
-        catch (e) { console.warn('[gist] reconcile skipped:', e.message); }
-    }
-    // Full-snapshot backup: per-session reconcile (pull or push by newest).
+    // Full-snapshot backup: per-session reconcile (pull or push by newest),
+    // so the newest copy wins before any view renders.
     if (window.GistBackup?.isConnected()) {
         try {
             const { action } = await GistBackup.reconcileOnOpen();

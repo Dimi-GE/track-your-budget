@@ -166,6 +166,9 @@
 }
 
 .currency-star,
+.currency-edit,
+.currency-save,
+.currency-cancel,
 .currency-remove {
     background: none;
     border: none;
@@ -181,8 +184,29 @@
 .currency-star:hover { color: var(--accent); }
 .currency-row--regional .currency-star { color: var(--accent); }
 
+.currency-edit:hover   { color: var(--accent); }
+.currency-save         { color: var(--accent); }
+.currency-save:hover   { color: var(--positive, #66bb6a); }
+.currency-cancel:hover { color: var(--negative); }
+
 .currency-remove:hover:not(:disabled) { color: var(--negative); }
 .currency-remove:disabled { opacity: 0.3; cursor: default; }
+
+/* ── Inline edit row ─────────────────────────────────────────────────── */
+.currency-row--editing { gap: 6px; }
+
+.currency-row--editing .currency-input {
+    padding: 5px 8px;
+    box-sizing: border-box;
+    min-width: 0;   /* let inputs shrink below their default ~20ch intrinsic width */
+}
+
+/* Code and Symbol are the shortest values, so keep them narrow and fixed; Name
+   takes the remaining space. Scoped under .currency-row--editing so these widths
+   out-specify the shared .currency-input width above. */
+.currency-row--editing .currency-edit-code { flex: 0 0 64px;  width: 64px; }
+.currency-row--editing .currency-edit-sym  { flex: 0 0 44px;  width: 44px; text-align: center; }
+.currency-row--editing .currency-edit-name { flex: 1 1 auto;  width: auto; }
 
 .currency-code {
     font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
@@ -323,25 +347,25 @@
     min-width: 0;
 }
 
-.gist-fields {
+/* Token / gist id input with its action button(s) on the same line. */
+.gist-connect-row {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
     margin-top: 14px;
-    max-width: 380px;
+    max-width: 420px;
 }
 
-.gist-field {
+.gist-connect-row .gist-input {
+    flex: 1;
+    min-width: 160px;
+}
+
+.gist-action-inline {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.gist-field-label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--text-muted);
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .gist-input {
@@ -364,27 +388,6 @@
     color: var(--text-muted);
     background: transparent;
     cursor: default;
-}
-
-.backup-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.backup-actions .btn-backup,
-.backup-actions .btn-restore,
-.backup-actions .btn-gist-disconnect,
-.backup-actions .btn-confirm-yes,
-.backup-actions .btn-confirm-no {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-}
-
-.backup-actions .btn-confirm-row {
-    flex-direction: column;
-    align-items: stretch;
 }
 
 .gist-status {
