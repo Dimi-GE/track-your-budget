@@ -2,13 +2,18 @@
 
 const MARKED_CDN = 'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js';
 
-const MD_BADGE_STYLES = {
-    feature:     { bg: 'rgba(74,158,255,0.15)',   color: '#4a9eff' },
-    fix:         { bg: 'rgba(224,92,92,0.15)',    color: '#e05c5c' },
-    improvement: { bg: 'rgba(123,198,126,0.15)',  color: '#7bc67e' },
-    breaking:    { bg: 'rgba(245,168,0,0.15)',    color: '#f5a800' },
-    refactor:    { bg: 'rgba(150,150,150,0.15)',  color: '#888888' },
+// Changelog entry types — single source of truth for the timeline. Each entry's
+// leading `word` tag maps to a fixed-size icon chip so every row's text aligns,
+// with a legend (built from this same map) decoding the icons. To add/rename a
+// type, edit only here. Icons are Tabler glyphs (ti-*), loaded app-wide.
+const MD_BADGE_META = {
+    feature:     { icon: 'ti-sparkles',    label: 'Feature',     bg: 'rgba(74,158,255,0.15)',   color: '#4a9eff' },
+    improvement: { icon: 'ti-trending-up', label: 'Improvement', bg: 'rgba(123,198,126,0.15)',   color: '#7bc67e' },
+    fix:         { icon: 'ti-tool',        label: 'Fix',         bg: 'rgba(224,92,92,0.15)',     color: '#e05c5c' },
+    removed:     { icon: 'ti-trash',       label: 'Removed',     bg: 'rgba(245,168,0,0.15)',     color: '#f5a800' },
+    docs:        { icon: 'ti-file-text',   label: 'Docs',        bg: 'rgba(150,150,150,0.15)',   color: '#888888' },
 };
+const MD_BADGE_FALLBACK = { icon: 'ti-point-filled', label: 'Other', bg: 'rgba(150,150,150,0.15)', color: '#888888' };
 
 const MD_COLUMN_DOTS = {
     'Done':        'done',
@@ -102,7 +107,22 @@ function mdRenderTimeline(tokens, targetEl) {
         }
     });
 
-    targetEl.innerHTML = groups.map(g => `
+    // A chip is a fixed-size icon square; identical width on every row is what
+    // keeps the entry text aligned. `title` gives a hover tooltip of the label.
+    const chip = (meta) =>
+        `<span class="cl-badge" style="background:${meta.bg};color:${meta.color}" title="${meta.label}"><i class="ti ${meta.icon}"></i></span>`;
+
+    const legend = `
+        <div class="changelog-legend">
+            <span class="changelog-legend-title">Legend</span>
+            ${Object.values(MD_BADGE_META).map(m => `
+                <span class="changelog-legend-item">
+                    ${chip(m)}<span class="cl-legend-label">${m.label}</span>
+                </span>
+            `).join('')}
+        </div>`;
+
+    targetEl.innerHTML = legend + groups.map(g => `
         <div class="changelog-group">
             <div class="changelog-version">
                 <span class="version-tag">${g.version}</span>
@@ -110,12 +130,10 @@ function mdRenderTimeline(tokens, targetEl) {
             </div>
             <div class="changelog-entries">${
                 g.entries.map(e => {
-                    const style = e.badge && MD_BADGE_STYLES[e.badge]
-                        ? `background:${MD_BADGE_STYLES[e.badge].bg};color:${MD_BADGE_STYLES[e.badge].color}`
-                        : 'background:rgba(150,150,150,0.15);color:#888';
+                    const meta = (e.badge && MD_BADGE_META[e.badge]) || MD_BADGE_FALLBACK;
                     return `
                         <div class="changelog-entry">
-                            ${e.badge ? `<span class="md-badge" style="${style}">${e.badge}</span>` : ''}
+                            ${chip(meta)}
                             <span class="entry-text">${e.text}</span>
                         </div>
                     `;

@@ -93,28 +93,60 @@
 
 .changelog-entry {
     display: flex;
-    align-items: center;
+    align-items: flex-start;   /* icon aligns to the first line of a long entry */
     gap: 10px;
 }
 
-.entry-badge {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 2px 7px;
-    border-radius: 4px;
+/* Fixed-size icon chip — uniform width on every row keeps the text aligned.
+   Shared by changelog entries and the legend. */
+.cl-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    font-size: 13px;
     flex-shrink: 0;
 }
-
-.entry-badge--feature     { background: rgba(74, 158, 255, 0.15); color: #4a9eff; }
-.entry-badge--fix         { background: rgba(224, 92, 92, 0.15);  color: #e05c5c; }
-.entry-badge--improvement { background: rgba(123, 198, 126, 0.15); color: #7bc67e; }
 
 .entry-text {
     font-size: 13px;
     color: var(--text-primary);
     line-height: 1.5;
+    padding-top: 2px;   /* nudge text to visually centre against the 22px chip */
+}
+
+/* Legend — icon → meaning map above the timeline (mirrors the category legend) */
+.changelog-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+}
+
+.changelog-legend-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-right: 2px;
+}
+
+.changelog-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.cl-legend-label {
+    font-size: 12px;
+    color: var(--text-muted);
 }
 
 /* Roadmap rows */
@@ -190,18 +222,6 @@
     font-size: 12px;
     color: var(--text-muted);
     line-height: 1.6;
-}
-
-/* Engine-generated badge (inline styled, class handles structure only) */
-.md-badge {
-    display: inline-block;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding: 2px 7px;
-    border-radius: 4px;
-    flex-shrink: 0;
 }
 
 /* Docs mode */
